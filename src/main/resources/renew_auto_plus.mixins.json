@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8.2",
+  "package": "net.fabricmc.renew_auto_plus.extension",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "PickaxeItemExtension",
+    "FurnaceBlockExtension"
+  ],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

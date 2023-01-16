@@ -1,0 +1,9 @@
+{
+    "parent": "minecraft:block/orientable",
+    "textures": {
+      "top": "minecraft:block/copper_block",
+      "front": "renew_auto_plus:block/extractor_front",
+      "side": "renew_auto_plus:block/extractor_side",
+      "bottom": "minecraft:block/smooth_stone"
+    }
+  }

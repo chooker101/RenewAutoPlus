@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " # ",
+        " X ",
+        " X "
+    ],
+    "key": {
+        "#": {
+          "item": "minecraft:copper_ingot"
+        },
+        "X": {
+          "item": "minecraft:stick"
+        }
+    },
+    "result": {
+      "item": "renew_auto_plus:copper_shovel"
+    }
+}

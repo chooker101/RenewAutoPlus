@@ -1,0 +1,8 @@
+{
+    "extractor_on":  {
+        "subtitle": "subtitles.renew_auto_plus.extractor_on",
+        "sounds": [
+            "renew_auto_plus:extractor_on"
+        ]
+    }
+}

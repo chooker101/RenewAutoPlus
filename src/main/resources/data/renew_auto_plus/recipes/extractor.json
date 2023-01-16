@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "###",
+        "#Y ",
+        "XXX"
+    ],
+    "key": {
+        "#": {
+          "item": "minecraft:copper_ingot"
+        },
+        "X": {
+          "item": "minecraft:smooth_stone"
+        },
+        "Y": {
+          "item": "minecraft:furnace"
+        }
+    },
+    "result": {
+      "item": "renew_auto_plus:extractor"
+    }
+}

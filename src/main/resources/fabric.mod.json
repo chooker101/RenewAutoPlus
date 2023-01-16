@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "renew_auto_plus",
+  "version": "1.0.0",
+
+  "name": "RenewAutoPlus",
+  "description": "This mod is for extending the RenewAuto behavior to help with automation/renewable resources.",
+  "authors": [
+    "Carsten Hooker"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/renew_auto_plus/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.fabricmc.renew_auto_plus.RenewAutoPlusInitialize"
+    ],
+    "client": [
+      "net.fabricmc.renew_auto_plus.RenewAutoPlusClientInitialize"
+    ]
+  },
+  "mixins": [
+    "renew_auto_plus.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.12.8",
+    "fabric": "*",
+    "minecraft": "1.18.x",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

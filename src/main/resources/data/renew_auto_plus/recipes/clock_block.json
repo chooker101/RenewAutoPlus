@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "###",
+        "XXY",
+        "###"
+    ],
+    "key": {
+        "#": {
+          "item": "minecraft:gold_ingot"
+        },
+        "X": {
+          "item": "minecraft:redstone"
+        },
+        "Y": {
+          "item": "minecraft:clock"
+        }
+    },
+    "result": {
+      "item": "renew_auto_plus:clock_block"
+    }
+}

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,powered=false": {
+      "model": "renew_auto_plus:block/clock_block",
+      "y": 90
+    },
+    "facing=east,powered=true": {
+      "model": "renew_auto_plus:block/clock_block_on",
+      "y": 90
+    },
+    "facing=north,powered=false": {
+      "model": "renew_auto_plus:block/clock_block"
+    },
+    "facing=north,powered=true": {
+      "model": "renew_auto_plus:block/clock_block_on"
+    },
+    "facing=south,powered=false": {
+      "model": "renew_auto_plus:block/clock_block",
+      "y": 180
+    },
+    "facing=south,powered=true": {
+      "model": "renew_auto_plus:block/clock_block_on",
+      "y": 180
+    },
+    "facing=west,powered=false": {
+      "model": "renew_auto_plus:block/clock_block",
+      "y": 270
+    },
+    "facing=west,powered=true": {
+      "model": "renew_auto_plus:block/clock_block_on",
+      "y": 270
+    }
+  }
+}
