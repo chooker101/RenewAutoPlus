@@ -154,12 +154,12 @@ public class ClockBlockEntityRender<T extends BlockEntity> implements BlockEntit
         }
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(this.renderLayer);
-        lightAbove = lightAbove - (lightAbove / 16);
+        //lightAbove = lightAbove - (lightAbove / 16);
         
-        vertexConsumer.vertex(matrix4f, 0.0f, 128.0f, -0.01f).color(255, 255, 255, 255).texture(1.0f, 0.0f).light(lightAbove).next();
-        vertexConsumer.vertex(matrix4f, 128.0f, 128.0f, -0.01f).color(255, 255, 255, 255).texture(0.0f, 0.0f).light(lightAbove).next();
-        vertexConsumer.vertex(matrix4f, 128.0f, 0.0f, -0.01f).color(255, 255, 255, 255).texture(0.0f, 1.0f).light(lightAbove).next();
-        vertexConsumer.vertex(matrix4f, 0.0f, 0.0f, -0.01f).color(255, 255, 255, 255).texture(1.0f, 1.0f).light(lightAbove).next();
+        vertexConsumer.vertex(matrix4f, 0.0f, 128.0f, -0.01f).color(128, 128, 128, 255).texture(1.0f, 0.0f).light(lightAbove).next();
+        vertexConsumer.vertex(matrix4f, 128.0f, 128.0f, -0.01f).color(128, 128, 128, 255).texture(0.0f, 0.0f).light(lightAbove).next();
+        vertexConsumer.vertex(matrix4f, 128.0f, 0.0f, -0.01f).color(128, 128, 128, 255).texture(0.0f, 1.0f).light(lightAbove).next();
+        vertexConsumer.vertex(matrix4f, 0.0f, 0.0f, -0.01f).color(128, 128, 128, 255).texture(1.0f, 1.0f).light(lightAbove).next();
         matrices.pop();
     }
 }

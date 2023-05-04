@@ -1,0 +1,10 @@
+{
+    "replace": false,
+    "values": [
+      "renew_auto_plus:capacitor",
+      "renew_auto_plus:clock_block",
+      "renew_auto_plus:extractor",
+      "renew_auto_plus:pump",
+      "renew_auto_plus:smelter"
+    ]
+}

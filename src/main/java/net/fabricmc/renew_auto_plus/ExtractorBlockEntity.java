@@ -150,8 +150,6 @@ public class ExtractorBlockEntity extends LockableContainerBlockEntity implement
             stack.setCount(this.getMaxCountPerStack());
         }
         if (slot == 0 && !bl) {
-            this.totalBreakingTime = 1600;
-            this.currentBreakingProgress = 0;
             this.markDirty();
         }
     }
@@ -175,7 +173,7 @@ public class ExtractorBlockEntity extends LockableContainerBlockEntity implement
         }
         if (slot == 0) {
             ItemStack itemStack = this.inventory.get(0);
-            return AbstractFurnaceBlockEntity.canUseAsFuel(stack) || stack.isOf(Items.BUCKET) && !itemStack.isOf(Items.BUCKET);
+            return AbstractFurnaceBlockEntity.canUseAsFuel(stack) || stack.isOf(Items.LAVA_BUCKET) && !itemStack.isOf(Items.LAVA_BUCKET);
         }
         return true;
     }
@@ -183,9 +181,9 @@ public class ExtractorBlockEntity extends LockableContainerBlockEntity implement
     @Override
     public int[] getAvailableSlots(Direction side) {
         if (side == Direction.DOWN) {
-            return new int[]{0};
+            return new int[]{1};
         }
-        return new int[]{1};
+        return new int[]{0};
     }
 
     @Override
@@ -202,10 +200,10 @@ public class ExtractorBlockEntity extends LockableContainerBlockEntity implement
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        if (slot == 0) {
-            return false;
+        if (slot == 1) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -218,15 +216,16 @@ public class ExtractorBlockEntity extends LockableContainerBlockEntity implement
         return new ExtractorScreenHandler(syncId, playerInventory, this, this.propertyDelegate);
     }
 
+    //Need to add Glowstone/Nether shit
     public static boolean isAnOre(BlockState blockState) {
         return blockState.isIn(BlockTags.GOLD_ORES) || blockState.isIn(BlockTags.IRON_ORES) || blockState.isIn(BlockTags.DIAMOND_ORES) || blockState.isIn(BlockTags.REDSTONE_ORES) || blockState.isIn(BlockTags.LAPIS_ORES) || blockState.isIn(BlockTags.COAL_ORES) || blockState.isIn(BlockTags.EMERALD_ORES) || blockState.isIn(BlockTags.COPPER_ORES);
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, ExtractorBlockEntity blockEntity) {
         BlockPos frontBlock = pos.offset(state.get(ExtractorBlock.FACING));
-        BlockState blockState = world.getBlockState(frontBlock);
+        BlockState frontBlockState = world.getBlockState(frontBlock);
         boolean blockUpdate = false;
-        if(!isAnOre(blockState)) {
+        if(!isAnOre(frontBlockState)) {
             return;
         }
         blockEntity.soundTime = blockEntity.soundTime + 1;
@@ -246,12 +245,12 @@ public class ExtractorBlockEntity extends LockableContainerBlockEntity implement
             }
         }
 
-        if (blockState != null) {
+        if (frontBlockState != null) {
             if(!blockEntity.getStack(1).isEmpty()) {
                 return;
             }
    
-            float hardness = blockState.getHardness(world, frontBlock);
+            float hardness = frontBlockState.getHardness(world, frontBlock);
             if (hardness == -1.0F) {
                return;
             } else {
@@ -263,27 +262,25 @@ public class ExtractorBlockEntity extends LockableContainerBlockEntity implement
                     }
                 }
             }
-
-            
             
             if (blockEntity.currentBreakingProgress >= blockEntity.totalBreakingTime) {
-                blockUpdate = true;
-                blockEntity.currentBreakingProgress = 0;
                 if(world instanceof ServerWorld) {
-                    List<ItemStack> droppedStacks = Block.getDroppedStacks(blockState, (ServerWorld)world, frontBlock, null);
+                    blockUpdate = true;
+                    blockEntity.currentBreakingProgress = 0;
+                    List<ItemStack> droppedStacks = Block.getDroppedStacks(frontBlockState, (ServerWorld)world, frontBlock, null);
                     if(blockEntity.getStack(1).isEmpty()){
                         blockEntity.setStack(1, droppedStacks.get(0));
                     }
                 }
             }
             world.setBlockBreakingInfo(blockEntity.hashCode(), frontBlock, (int)((float)blockEntity.currentBreakingProgress * 10.0f / (float)blockEntity.totalBreakingTime) - 1);
-         }
-         if(blockUpdate) {
-            ExtractorBlockEntity.markDirty(world, pos, state);
-         }
-         if(blockEntity.soundTime > 80) {
-            blockEntity.soundTime = 80;
         }
-         return;
+        if(blockUpdate) {
+           ExtractorBlockEntity.markDirty(world, pos, state);
+        }
+        if(blockEntity.soundTime > 80) {
+           blockEntity.soundTime = 80;
+        }
+        return;
     }
 }

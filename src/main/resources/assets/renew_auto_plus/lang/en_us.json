@@ -7,10 +7,12 @@
     "item.renew_auto_plus.raw_diamond": "Raw Diamond",
     "item.renew_auto_plus.lettuce": "Lettuce",
     "block.renew_auto_plus.smelter": "Smelter",
+    "container.smelter": "Smelter",
     "block.renew_auto_plus.extractor": "Extractor",
     "block.renew_auto_plus.clock_block": "Clock Block",
     "block.renew_auto_plus.capacitor": "Capacitor",
     "block.renew_auto_plus.lettuce": "Lettuce",
+    "block.renew_auto_plus.pump": "Pump",
     "effect.minecraft.big_dick": "You got a Big Dick",
     "subtitles.renew_auto_plus.extractor_on": "Extractor whirs"
 }

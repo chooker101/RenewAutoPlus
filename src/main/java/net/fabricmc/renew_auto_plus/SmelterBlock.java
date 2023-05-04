@@ -55,7 +55,6 @@ extends AbstractFurnaceBlock {
 	public VoxelShape getOutlineShape(BlockState state, BlockView view, BlockPos pos, ShapeContext ctx) {
         
         return VoxelShapes.union(VoxelShapes.union(Block.createCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D), Block.createCuboidShape(1.0D, 2.0D, 1.0D, 15.0D, 8.0D, 15.0D)), Block.createCuboidShape(2.0D, 8.0D, 2.0D, 14.0D, 16.0D, 14.0D));
-        //return VoxelShapes.fullCube();
     }
 
     @Override

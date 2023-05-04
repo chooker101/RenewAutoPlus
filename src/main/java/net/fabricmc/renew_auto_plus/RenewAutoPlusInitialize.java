@@ -45,13 +45,14 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 	public static final Block PUMP = new PumpBlock(FabricBlockSettings.of(Material.METAL).strength(4.0f).requiresTool());
 
 	public static final StatusEffect BIG_DICK = Registry.register(Registry.STATUS_EFFECT, 65, "big_dick", new PublicStatusEffect(StatusEffectCategory.BENEFICIAL, 0x44FF44));
-	public static final FoodComponent LETTUC_FOOD_COMPONENT = new FoodComponent.Builder().hunger(4).saturationModifier(0.3f).statusEffect(new StatusEffectInstance(BIG_DICK, 200, 0), 0.3f).build();
+	public static final FoodComponent LETTUCE_FOOD_COMPONENT = new FoodComponent.Builder().hunger(4).saturationModifier(0.3f).statusEffect(new StatusEffectInstance(BIG_DICK, 200, 0), 0.3f).build();
 
-	public static final Item LETTUCE = new AliasedBlockItem(LETTUCE_BLOCK, new Item.Settings().group(ItemGroup.FOOD).food(LETTUC_FOOD_COMPONENT));
+	public static final Item LETTUCE = new AliasedBlockItem(LETTUCE_BLOCK, new Item.Settings().group(ItemGroup.FOOD).food(LETTUCE_FOOD_COMPONENT));
 
 	public static final ScreenHandlerType<ExtractorScreenHandler> EXTRACTOR_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier("renew_auto_plus", "extractor"), ExtractorScreenHandler::new);
 	public static final ScreenHandlerType<ClockBlockScreenHandler> CLOCK_BLOCK_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier("renew_auto_plus", "clock_block"), ClockBlockScreenHandler::new);
 	public static final ScreenHandlerType<CapacitorScreenHandler> CAPACITOR_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier("renew_auto_plus", "capacitor"), CapacitorScreenHandler::new);
+	public static final ScreenHandlerType<PumpScreenHandler> PUMP_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier("renew_auto_plus", "pump"), PumpScreenHandler::new);
 
 	public static final BlockEntityType<FurnaceBlockEntityReplacement> FURNACE_BLOCK_ENTITY_REPLACEMENT = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("renew_auto_plus", "furnace_entity_replacement"), FabricBlockEntityTypeBuilder.create(FurnaceBlockEntityReplacement::new, Blocks.FURNACE, SMELTER).build());
 	public static final BlockEntityType<ExtractorBlockEntity> EXTRACTOR_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("renew_auto_plus", "extractor_block_entity"), FabricBlockEntityTypeBuilder.create(ExtractorBlockEntity::new, EXTRACTOR).build());

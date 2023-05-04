@@ -11,7 +11,9 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.ActionResult;
@@ -30,10 +32,13 @@ import net.minecraft.world.World;
 
 public class PumpBlock extends BlockWithEntity {
 	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+    public static final IntProperty LEVEL = Properties.LEVEL_8;
+    public static final BooleanProperty LIQUID_TYPE = Properties.CONDITIONAL;
+    public static final BooleanProperty POWERED = Properties.POWERED;
 
     public PumpBlock(Settings settings) {
 		super(settings);
-		setDefaultState(this.stateManager.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH));
+		setDefaultState(this.stateManager.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH).with(Properties.LEVEL_8, 0).with(Properties.CONDITIONAL, true).with(Properties.POWERED, false));
 	}
 
     @Override
@@ -47,10 +52,9 @@ public class PumpBlock extends BlockWithEntity {
             return ActionResult.SUCCESS;
          } else {
             BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof ExtractorBlockEntity) {
-               player.openHandledScreen((ExtractorBlockEntity)blockEntity);
+            if (blockEntity instanceof PumpBlockEntity) {
+               player.openHandledScreen((PumpBlockEntity)blockEntity);
             }
-   
             return ActionResult.CONSUME;
          }
     }
@@ -63,12 +67,12 @@ public class PumpBlock extends BlockWithEntity {
 
     @Override
 	protected void appendProperties(StateManager.Builder<Block, BlockState> stateManager) {
-		stateManager.add(Properties.HORIZONTAL_FACING);
+		stateManager.add(Properties.HORIZONTAL_FACING, Properties.LEVEL_8, Properties.CONDITIONAL, Properties.POWERED);
 	}
 
     @Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerFacing().getOpposite());
+		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerFacing());
 	}
 
 	@Override
@@ -86,7 +90,17 @@ public class PumpBlock extends BlockWithEntity {
 		Direction facing = state.get(FACING);
 
         if(facing == Direction.NORTH) {
-            return Block.createCuboidShape(3.0D, 0.0D, 5.0D, 13.0D, 1.0D, 15.0D);
+            //Bottom, N Wall + S Wall, E Wall + W Wall
+            return VoxelShapes.union(VoxelShapes.union(Block.createCuboidShape(3.0D, 0.0D, 5.0D, 13.0D, 1.0D, 15.0D), Block.createCuboidShape(3.0D, 1.0D, 4.0D, 13.0D, 5.0D, 16.0D)), Block.createCuboidShape(2.0D, 1.0D, 5.0D, 14.0D, 5.0D, 15.0D));
+        }
+        else if(facing == Direction.EAST) {
+            return VoxelShapes.union(VoxelShapes.union(Block.createCuboidShape(1.0D, 0.0D, 3.0D, 11.0D, 1.0D, 13.0D), Block.createCuboidShape(0.0D, 1.0D, 3.0D, 12.0D, 5.0D, 13.0D)), Block.createCuboidShape(1.0D, 1.0D, 2.0D, 11.0D, 5.0D, 14.0D));
+        }
+        else if(facing == Direction.SOUTH) {
+            return VoxelShapes.union(VoxelShapes.union(Block.createCuboidShape(3.0D, 0.0D, 1.0D, 13.0D, 1.0D, 11.0D), Block.createCuboidShape(3.0D, 1.0D, 0.0D, 13.0D, 5.0D, 12.0D)), Block.createCuboidShape(2.0D, 1.0D, 1.0D, 14.0D, 5.0D, 11.0D));
+        }
+        else if(facing == Direction.WEST) {
+            return VoxelShapes.union(VoxelShapes.union(Block.createCuboidShape(5.0D, 0.0D, 3.0D, 15.0D, 1.0D, 13.0D), Block.createCuboidShape(4.0D, 1.0D, 3.0D, 16.0D, 5.0D, 13.0D)), Block.createCuboidShape(5.0D, 1.0D, 2.0D, 15.0D, 5.0D, 14.0D));
         }
 
         return VoxelShapes.fullCube();

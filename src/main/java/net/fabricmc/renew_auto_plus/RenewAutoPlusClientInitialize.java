@@ -16,6 +16,7 @@ public class RenewAutoPlusClientInitialize implements ClientModInitializer {
         ScreenRegistry.register(RenewAutoPlusInitialize.EXTRACTOR_SCREEN_HANDLER, ExtractorScreen::new);
         ScreenRegistry.register(RenewAutoPlusInitialize.CLOCK_BLOCK_SCREEN_HANDLER, ClockBlockScreen::new);
         ScreenRegistry.register(RenewAutoPlusInitialize.CAPACITOR_SCREEN_HANDLER, CapacitorScreen::new);
+        ScreenRegistry.register(RenewAutoPlusInitialize.PUMP_SCREEN_HANDLER, PumpScreen::new);
 
         BlockEntityRendererRegistry.register(RenewAutoPlusInitialize.CLOCK_BLOCK_ENTITY, ClockBlockEntityRender::new);
         BlockEntityRendererRegistry.register(RenewAutoPlusInitialize.PUMP_BLOCK_ENTITY, PumpBlockEntityRender::new);
