@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "renew_auto_plus:block/abacus",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "renew_auto_plus:block/abacus"
+    },
+    "facing=south": {
+      "model": "renew_auto_plus:block/abacus",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "renew_auto_plus:block/abacus",
+      "y": 270
+    }
+  }
+}

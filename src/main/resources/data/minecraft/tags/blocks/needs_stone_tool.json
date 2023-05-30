@@ -46,6 +46,7 @@
     "renew_auto_plus:clock_block",
     "renew_auto_plus:extractor",
     "renew_auto_plus:pump",
-    "renew_auto_plus:smelter"
+    "renew_auto_plus:smelter",
+    "renew_auto_plus:copper_pipe"
   ]
 }

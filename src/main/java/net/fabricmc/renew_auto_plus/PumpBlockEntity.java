@@ -150,6 +150,9 @@ public class PumpBlockEntity extends LockableContainerBlockEntity implements Sid
 
     @Override
     public ItemStack removeStack(int slot, int amount) {
+        if(slot == 2) {
+            wasFullLastFrame = true;
+        }
         return Inventories.splitStack(this.inventory, slot, amount);
     }
 
@@ -186,7 +189,7 @@ public class PumpBlockEntity extends LockableContainerBlockEntity implements Sid
     @Override
     public boolean isValid(int slot, ItemStack stack) {
         if (slot == 2) {
-            return false;
+            return !this.inventory.get(2).isEmpty();
         }
         if (slot == 1) {
             ItemStack itemStack = this.inventory.get(1);
@@ -195,7 +198,7 @@ public class PumpBlockEntity extends LockableContainerBlockEntity implements Sid
         if (slot == 0) {
             return AbstractFurnaceBlockEntity.canUseAsFuel(stack);
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -226,7 +229,7 @@ public class PumpBlockEntity extends LockableContainerBlockEntity implements Sid
             ItemStack itemStack = this.inventory.get(0);
             return AbstractFurnaceBlockEntity.canUseAsFuel(stack) || stack.isOf(Items.LAVA_BUCKET) && !itemStack.isOf(Items.LAVA_BUCKET);
         }
-        return true;
+        return false;
     }
 
     @Override

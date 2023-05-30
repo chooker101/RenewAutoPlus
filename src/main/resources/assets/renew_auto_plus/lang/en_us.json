@@ -13,6 +13,14 @@
     "block.renew_auto_plus.capacitor": "Capacitor",
     "block.renew_auto_plus.lettuce": "Lettuce",
     "block.renew_auto_plus.pump": "Pump",
+    "block.renew_auto_plus.copper_pipe": "Copper Pipe",
+    "block.renew_auto_plus.abacus": "Abacus",
+    "block.renew_auto_plus.crate": "Crate",
+    "renew_auto_plus.abacus_tab.buy": "Buy",
+    "renew_auto_plus.abacus_tab.sell": "Sell",
+    "renew_auto_plus.abacus_tab.info": "Item Info",
+    "renew_auto_plus.abacus_tab.settings": "Settings",
+    "renew_auto_plus.abacus_tab.inventory": "Inventory",
     "effect.minecraft.big_dick": "You got a Big Dick",
     "subtitles.renew_auto_plus.extractor_on": "Extractor whirs"
 }
