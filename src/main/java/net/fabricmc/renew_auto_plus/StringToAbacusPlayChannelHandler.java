@@ -21,7 +21,7 @@ public class StringToAbacusPlayChannelHandler implements PlayChannelHandler {
         }
     }
 
-    public static void onStringToBlockEntity(ServerPlayerEntity player, ServerPlayNetworkHandler handler, StringToAbacusC2SPacket packet) {
+    public static void onStringToAbacus(ServerPlayerEntity player, ServerPlayNetworkHandler handler, StringToAbacusC2SPacket packet) {
         if(player.world != null) {
             AbacusBlockEntity abacusBlockEntity = null;
             BlockEntity blockEntity = player.world.getBlockEntity(packet.getBlockPos());
@@ -31,7 +31,16 @@ public class StringToAbacusPlayChannelHandler implements PlayChannelHandler {
             if(abacusBlockEntity == null) {
                 return;
             }
-            abacusBlockEntity.updateCompanyName(packet.getString());
+            if(packet.getType() == StringToAbacusC2SPacket.COMPANY_NAME_TYPE) {
+                abacusBlockEntity.updateCompanyName(packet.getString());
+            }
+            else if(packet.getType() == StringToAbacusC2SPacket.ADD_OWNER_NAME_TYPE) {
+                abacusBlockEntity.removeOwner(packet.getString());
+                abacusBlockEntity.tryAddOwner(packet.getString());
+            }
+            else if(packet.getType() == StringToAbacusC2SPacket.REMOVE_OWNER_NAME_TYPE) {
+                abacusBlockEntity.removeOwner(packet.getString());
+            }
         }
     }
 }

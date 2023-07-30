@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "renew_auto_plus:block/wastes_ruin"
+    },
+    "axis=y": {
+      "model": "renew_auto_plus:block/wastes_ruin"
+    },
+    "axis=z": {
+      "model": "renew_auto_plus:block/wastes_ruin"
+    }
+  }
+}

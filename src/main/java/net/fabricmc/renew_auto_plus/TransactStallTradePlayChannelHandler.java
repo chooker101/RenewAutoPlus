@@ -21,7 +21,7 @@ public class TransactStallTradePlayChannelHandler implements PlayChannelHandler 
         }
     }
 
-    public static void onStringToBlockEntity(ServerPlayerEntity player, ServerPlayNetworkHandler handler, TransactStallTradeC2SPacket packet) {
+    public static void onTransactStallTrade(ServerPlayerEntity player, ServerPlayNetworkHandler handler, TransactStallTradeC2SPacket packet) {
         if(player.world != null) {
             AbacusBlockEntity abacusBlockEntity = null;
             BlockEntity blockEntity = player.world.getBlockEntity(packet.getBlockPos());
@@ -31,7 +31,7 @@ public class TransactStallTradePlayChannelHandler implements PlayChannelHandler 
             if(abacusBlockEntity == null) {
                 return;
             }
-            abacusBlockEntity.handleTransactPacket(packet.getStallTrade(), packet.isPurchase(), false, packet.getTradeAmount());
+            abacusBlockEntity.handleTransactPacket(packet.getStallTrade(), packet.isPurchase(), packet.getTradeAmount());
         }
     }
 }

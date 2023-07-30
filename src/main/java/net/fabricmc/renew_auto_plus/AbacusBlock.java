@@ -43,7 +43,10 @@ public class AbacusBlock extends BlockWithEntity {
          } else {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof AbacusBlockEntity) {
-               player.openHandledScreen((AbacusBlockEntity)blockEntity);
+                if(((AbacusBlockEntity)blockEntity).getOwnerListSize() == 0) {
+                    ((AbacusBlockEntity)blockEntity).tryAddOwner(player.getEntityName());
+                }
+                player.openHandledScreen((AbacusBlockEntity)blockEntity);
             }
    
             return ActionResult.CONSUME;

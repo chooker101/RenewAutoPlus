@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "renew_auto_plus:item/banished_sword_clear"
+  }
+}

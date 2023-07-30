@@ -4,13 +4,14 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.DimensionRenderingRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.minecraft.client.render.RenderLayer;
 import net.fabricmc.api.EnvType;
 
 @Environment(EnvType.CLIENT)
 public class RenewAutoPlusClientInitialize implements ClientModInitializer {
-
     @Override
     public void onInitializeClient() {
         ScreenRegistry.register(RenewAutoPlusInitialize.EXTRACTOR_SCREEN_HANDLER, ExtractorScreen::new);
@@ -20,8 +21,13 @@ public class RenewAutoPlusClientInitialize implements ClientModInitializer {
         ScreenRegistry.register(RenewAutoPlusInitialize.ABACUS_SCREEN_HANDLER, AbacusScreen::new);
         ScreenRegistry.register(RenewAutoPlusInitialize.CRATE_SCREEN_HANDLER, CrateScreen::new);
 
+        DimensionRenderingRegistry.registerDimensionEffects(RenewAutoPlusInitialize.THE_WASTES, new WastesDimensionEffect());
+        DimensionRenderingRegistry.registerSkyRenderer(RenewAutoPlusInitialize.THE_WASTES_REGISTRY_KEY, new WastesSkyRenderer());
+
         BlockEntityRendererRegistry.register(RenewAutoPlusInitialize.CLOCK_BLOCK_ENTITY, ClockBlockEntityRender::new);
         BlockEntityRendererRegistry.register(RenewAutoPlusInitialize.PUMP_BLOCK_ENTITY, PumpBlockEntityRender::new);
+
+        EntityRendererRegistry.register(RenewAutoPlusInitialize.BANISHED_ENTITY, BanishedEntityRender::new);
 
         BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), RenewAutoPlusInitialize.LETTUCE_BLOCK);
     }

@@ -30,12 +30,13 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
     private DefaultedList<ItemStack> inventory;
     private int emeraldAmount;
     private int emeraldChange;
+    private int currentAutoTradeIndex = 0;
     private boolean needsAttachedCrates = false;
 
     public String companyName = "";
     public HashMap<BlockPos, CrateBlockEntity> attachedCrates = new HashMap<>();
     public StallBlockEntity attachedMarket;
-    public Vector<String> ownerNameList = new Vector<>();
+    public DefaultedList<String> ownerNameList;
     public Vector<AutoStallTrade> autoTradeList = new Vector<>();
 
     public final PropertyDelegate propertyDelegate = new PropertyDelegate() {
@@ -75,6 +76,7 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
     public AbacusBlockEntity(BlockPos pos, BlockState state) {
         super(RenewAutoPlusInitialize.ABACUS_BLOCK_ENTITY, pos, state);
         this.inventory = DefaultedList.ofSize(27, ItemStack.EMPTY);
+        this.ownerNameList = DefaultedList.of();
         emeraldAmount = 0;
         emeraldChange = 0;
     }
@@ -195,6 +197,32 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
         this.companyName = newName;
     }
 
+    public void tryAddOwner(String newName) {
+        if(ownerNameList.size() < MarketManager.MAX_ABACUS_OWNERS) {
+            ownerNameList.add(newName);
+        }
+    }
+
+    public void removeOwner(String name) {
+        int i = 0;
+        for(String owner : ownerNameList) {
+            if(owner.equals(name)) {
+                ownerNameList.remove(i);
+                break;
+            }
+            ++i;
+        }
+    }
+
+    public void removeAutoTrade(int index) {
+        if(index >= autoTradeList.size() || index < 0) return;
+        autoTradeList.remove(index);
+    }
+
+    public int getOwnerListSize() {
+        return ownerNameList.size();
+    }
+
     public void tryToAttachToMarket() {
         if(attachedMarket != null){
             return;
@@ -231,9 +259,9 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
         attachedCrates.remove(pos);
     }
 
-    public void handleTransactPacket(StallTrade stallTrade, Boolean isPurchase, Boolean isAutoTrade, int tradeAmount) {
+    public void handleTransactPacket(StallTrade stallTrade, Boolean isPurchase, int tradeAmount) {
         getRealEmeraldAmount();
-        if(isAutoTrade)
+        if(stallTrade.isAutoTradeEnabled())
         {
             if(tradeAmount > 0){
                 if(autoTradeList.size() < MarketManager.MAX_AUTO_TRADES){
@@ -245,12 +273,14 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
         {
             if(isPurchase) {
                 addItemToStackOrEmpty(stallTrade.getTradedItem(), tradeAmount);
-                decreaseRealEmeralds((stallTrade.getEmeraldAmount() * tradeAmount) + (stallTrade.getEmeraldChange() * tradeAmount) / 100);
+                attachedMarket.removeItemOrMaterialsFromInventory(stallTrade.getTradedItem().getItem(), tradeAmount);
+                decreaseRealEmeralds((stallTrade.getEmeraldAmount() * tradeAmount) + ((100 - this.emeraldChange) + stallTrade.getEmeraldChange() * tradeAmount) / 100);
                 decreaseEmeraldChange(stallTrade.getEmeraldChange() * tradeAmount);
             }
             else {
                 removeItemInStackOrEmpty(stallTrade.getTradedItem(), tradeAmount);
-                increaseRealEmeralds((stallTrade.getEmeraldAmount() * tradeAmount) + (stallTrade.getEmeraldChange() * tradeAmount) / 100);
+                attachedMarket.addItemToInventory(stallTrade.getTradedItem().getItem(), tradeAmount);
+                increaseRealEmeralds((stallTrade.getEmeraldAmount() * tradeAmount) + (this.emeraldChange + stallTrade.getEmeraldChange() * tradeAmount) / 100);
                 increaseEmeraldChange(stallTrade.getEmeraldChange() * tradeAmount);
             }
         }
@@ -364,6 +394,38 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
                 }
             }
         }
+
+        //Add new stack if no room
+        int i = 0;
+        for (ItemStack stack : inventory) {
+            if(stack.isEmpty()) {
+                if(amount <= 64) {
+                    this.setStack(i, new ItemStack(Items.EMERALD, amount));
+                    return;
+                }
+                else {
+                    this.setStack(i, new ItemStack(Items.EMERALD, 64));
+                    amount -= 64;
+                }
+            }
+            i++;
+        }
+        for (CrateBlockEntity crate : this.attachedCrates.values()) {
+            i = 0;
+            for (ItemStack stack : crate.getInventory()) {
+                if(stack.isEmpty()) {
+                    if(amount <= 64) {
+                        crate.setStack(i, new ItemStack(Items.EMERALD, amount));
+                        return;
+                    }
+                    else {
+                        crate.setStack(i, new ItemStack(Items.EMERALD, 64));
+                        amount -= 64;
+                    }
+                }
+                i++;
+            }
+        }
     }
 
     private void decreaseRealEmeralds(int amount) {
@@ -382,7 +444,6 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
                         amount -= stack.getCount();
                         this.emeraldAmount -= stack.getCount();
                         stack.decrement(stack.getCount());
-
                     }
 
                 }
@@ -466,34 +527,34 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
             }
         }
 
+        int i = 0;
         for (ItemStack stack : inventory) {
             if(stack.isEmpty()) {
                 if(amount <= 64) {
-                    addItem.setCount(amount);
-                    stack = addItem.copy();
+                    this.setStack(i, new ItemStack(addItem.getItem(), amount));
                     return;
                 }
                 else {
-                    addItem.setCount(64);
-                    stack = addItem.copy();
+                    this.setStack(i, new ItemStack(addItem.getItem(), 64));
                     amount -= 64;
                 }
             }
+            i++;
         }
         for (CrateBlockEntity crate : this.attachedCrates.values()) {
+            i = 0;
             for (ItemStack stack : crate.getInventory()) {
                 if(stack.isEmpty()) {
                     if(amount <= 64) {
-                        addItem.setCount(amount);
-                        stack = addItem.copy();
+                        crate.setStack(i, new ItemStack(addItem.getItem(), amount));
                         return;
                     }
                     else {
-                        addItem.setCount(64);
-                        stack = addItem.copy();
+                        crate.setStack(i, new ItemStack(addItem.getItem(), 64));
                         amount -= 64;
                     }
                 }
+                i++;
             }
         }
     }
@@ -502,6 +563,7 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
         if(amount <= 0) {
             return;
         }
+        int i = 0;
         for (ItemStack stack : inventory) {
             if(!stack.isEmpty()){
                 if(ItemStack.areItemsEqual(stack, addItem)) {
@@ -511,13 +573,15 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
                     }
                     else {
                         amount -= stack.getCount();
-                        stack = ItemStack.EMPTY;
+                        this.setStack(i, ItemStack.EMPTY);
                     }
 
                 }
             }
+            i++;
         }
         for (CrateBlockEntity crate : this.attachedCrates.values()) {
+            i = 0;
             for (ItemStack stack : crate.getInventory()) {
                 if(!stack.isEmpty()){
                     if(ItemStack.areItemsEqual(stack, addItem)) {
@@ -527,15 +591,71 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
                         }
                         else {
                             amount -= stack.getCount();
-                            stack = ItemStack.EMPTY;
+                            this.setStack(i, ItemStack.EMPTY);
                         }
                     }
                 }
+                i++;
+            }
+        }
+    }
+
+    public static boolean canBuyWithAmount(int emeraldAmount, int emeraldChange, int tradeAmount, int ownedEmeralds, int ownedChange)
+    {
+        if(emeraldChange == 0){
+            emeraldAmount = emeraldAmount * tradeAmount;
+        }
+        else {
+            emeraldChange = emeraldChange * tradeAmount;
+            emeraldAmount += emeraldChange / 100;
+            emeraldChange = emeraldChange % 100;
+        }
+        if(ownedEmeralds > emeraldAmount) {
+            return true;
+        }
+        else if(ownedChange >= emeraldChange && ownedEmeralds >= emeraldAmount) {
+            return true;
+        }
+        return false;
+    }
+
+    public int getAutoTradeIndex() {
+        return currentAutoTradeIndex;
+    }
+
+    public void iterateAutoTradeIndex() {
+        if(autoTradeList.size() <= 0) return;
+        currentAutoTradeIndex = (currentAutoTradeIndex + 1) % autoTradeList.size(); 
+    }
+
+    // Passing in index incase somewhere else wants to use it
+    public void tryTransactAutoTrade(int index) {
+        if(index < 0 || index >= autoTradeList.size()) return;
+        if(attachedMarket == null) return;
+
+        AutoStallTrade trade = autoTradeList.get(index);
+        getRealEmeraldAmount();
+        if(trade.isPurchase) {
+            if(attachedMarket.getItemsForTrade(trade, trade.tradeAmount) > 0 && canBuyWithAmount(trade.getEmeraldAmount(), trade.getEmeraldChange(), trade.tradeAmount, this.emeraldAmount, this.emeraldChange)) {
+                addItemToStackOrEmpty(trade.getTradedItem(), trade.tradeAmount);
+                attachedMarket.removeItemOrMaterialsFromInventory(trade.getTradedItem().getItem(), trade.tradeAmount);
+                decreaseRealEmeralds((trade.getEmeraldAmount() * trade.tradeAmount) + (trade.getEmeraldChange() * trade.tradeAmount) / 100);
+                decreaseEmeraldChange(trade.getEmeraldChange() * trade.tradeAmount);
+            }
+        }
+        else {
+            if(checkIfHaveToSell(trade) >= trade.tradeAmount) {
+                removeItemInStackOrEmpty(trade.getTradedItem(), trade.tradeAmount);
+                attachedMarket.addItemToInventory(trade.getTradedItem().getItem(), trade.tradeAmount);
+                increaseRealEmeralds((trade.getEmeraldAmount() * trade.tradeAmount) + (trade.getEmeraldChange() * trade.tradeAmount) / 100);
+                increaseEmeraldChange(trade.getEmeraldChange() * trade.tradeAmount);
             }
         }
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, AbacusBlockEntity blockEntity) {
+        blockEntity.tryTransactAutoTrade(blockEntity.getAutoTradeIndex());
+        blockEntity.iterateAutoTradeIndex();
         return;
     }
 
@@ -558,14 +678,32 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
                 int i = checkIfHaveToSell(stallTrade);
                 if(i > 0){
                     stallTrade.setSellable(true);
-                    stallTrade.setItemAmount(i);
+                    stallTrade.setCompanyItemAmount(i);
                 }
                 else {
                     stallTrade.setSellable(false);
-                    stallTrade.setItemAmount(0);
+                    stallTrade.setCompanyItemAmount(0);
                 }
             }
             tradeList.toPacket(packetByteBuf);
+        }
+        packetByteBuf.writeByte((byte)(ownerNameList.size() & 0xFF));
+        for(String name : ownerNameList) {
+            packetByteBuf.writeString(name);
+        }
+
+        packetByteBuf.writeByte((byte)(attachedCrates.size() & 0xFF));
+        for(BlockPos pos : attachedCrates.keySet()) {
+            packetByteBuf.writeBlockPos(pos);
+        }
+
+        packetByteBuf.writeByte((byte)(autoTradeList.size() & 0xFF));
+        boolean isActive = true;
+        for(AutoStallTrade trade : autoTradeList) {
+            isActive = trade.isActive();
+            trade.setActive(trade.isPurchase);
+            trade.toPacket(packetByteBuf);
+            trade.setActive(isActive);
         }
     }
 
@@ -574,7 +712,7 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
         public boolean isPurchase = false;
 
         AutoStallTrade(StallTrade trade, int amount, boolean isPurchase) {
-            super(trade.getTradedItem(), trade.getEmeraldAmount(), trade.getEmeraldChange());
+            super(trade.getTradedItem(), trade.getEmeraldAmount(), trade.getEmeraldChange(), trade.getAmountBeforeCommon());
             this.tradeAmount = amount;
             this.isPurchase = isPurchase;
         }

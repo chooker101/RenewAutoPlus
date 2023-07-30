@@ -41,7 +41,7 @@ implements Packet<ServerPlayPacketListener> {
         if(handler == null) {
             return;
         }
-        TransactStallTradePlayChannelHandler.onStringToBlockEntity(handler.player, handler, this);
+        TransactStallTradePlayChannelHandler.onTransactStallTrade(handler.player, handler, this);
     }
 
     public BlockPos getBlockPos() {

@@ -9,23 +9,21 @@ import net.minecraft.util.math.BlockPos;
 public class StringToAbacusC2SPacket
 implements Packet<ServerPlayPacketListener> {
     public static final byte COMPANY_NAME_TYPE = 0;
-    public static final byte OWNER_NAME_TYPE = 0;
+    public static final byte ADD_OWNER_NAME_TYPE = 1;
+    public static final byte REMOVE_OWNER_NAME_TYPE = 2;
     private final BlockPos pos;
     private final String string;
-    private final byte packetDestination;
     private final byte packetType;
 
-    public StringToAbacusC2SPacket(BlockPos pos, String string, byte packetDestination, byte packetType) {
+    public StringToAbacusC2SPacket(BlockPos pos, String string, byte packetType) {
         this.pos = pos;
         this.string = string;
-        this.packetDestination = packetDestination;
         this.packetType = packetType;
     }
 
     public StringToAbacusC2SPacket(PacketByteBuf buf) {
         this.pos = buf.readBlockPos();
         this.string = buf.readString();
-        this.packetDestination = buf.readByte();
         this.packetType = buf.readByte();
     }
 
@@ -33,7 +31,6 @@ implements Packet<ServerPlayPacketListener> {
     public void write(PacketByteBuf buf) {
         buf.writeBlockPos(this.pos);
         buf.writeString(this.string);
-        buf.writeByte(this.packetDestination);
         buf.writeByte(this.packetType);
     }
 
@@ -43,7 +40,7 @@ implements Packet<ServerPlayPacketListener> {
         if(handler == null) {
             return;
         }
-        StringToAbacusPlayChannelHandler.onStringToBlockEntity(handler.player, handler, this);
+        StringToAbacusPlayChannelHandler.onStringToAbacus(handler.player, handler, this);
     }
 
     public BlockPos getBlockPos() {
@@ -52,10 +49,6 @@ implements Packet<ServerPlayPacketListener> {
 
     public String getString() {
         return this.string;
-    }
-
-    public byte getDestination() {
-        return this.packetDestination;
     }
 
     public byte getType() {

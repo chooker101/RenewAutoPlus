@@ -12,6 +12,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 
 public class AbacusScreenHandler extends ScreenHandler {
@@ -21,15 +22,32 @@ public class AbacusScreenHandler extends ScreenHandler {
     private BlockPos blockPos;
     private String currentCompanyName;
     private StallTradeList stallTradeList;
+    private DefaultedList<String> ownerNameList;
+    private DefaultedList<BlockPos> attachedCratesList;
+    private StallTradeList autoTradeList;
  
     public AbacusScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
         this(syncId, playerInventory, new SimpleInventory(27),  new ArrayPropertyDelegate(2));
         blockPos = buf.readBlockPos();
         currentCompanyName = buf.readString();
-        boolean isNotNull = buf.readBoolean();
-        if(isNotNull) {
+        boolean isTradeListNotNull = buf.readBoolean();
+        if(isTradeListNotNull) {
             stallTradeList = StallTradeList.fromPacket(buf);
         }
+
+        int ownerListSize = buf.readByte() & 0xFF;
+        ownerNameList = DefaultedList.ofSize(ownerListSize);
+        for(int i = 0; i < ownerListSize; i++) {
+            ownerNameList.add(i, buf.readString()); // Not sure I like this, likely not clean insertion
+        }
+
+        int crateListSize = buf.readByte() & 0xFF;
+        attachedCratesList = DefaultedList.ofSize(crateListSize);
+        for(int i = 0; i < crateListSize; i++) {
+            attachedCratesList.add(i, buf.readBlockPos()); // Not sure I like this, likely not clean insertion
+        }
+
+        autoTradeList = StallTradeList.fromPacket(buf);
     }
  
     public AbacusScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
@@ -125,6 +143,36 @@ public class AbacusScreenHandler extends ScreenHandler {
     public StallTradeList getStallTradeList() {
         return stallTradeList;
     }
+
+    public DefaultedList<String> getOwnerNameList() {
+        return ownerNameList;
+    }
+
+    public DefaultedList<BlockPos> getAttachedCratesList() {
+        return attachedCratesList;
+    }
+
+    public StallTradeList getAutoTradeList() {
+        return autoTradeList;
+    }
+
+    public void addOwnerName(String name) {
+        if(ownerNameList.size() < MarketManager.MAX_ABACUS_OWNERS) {
+            ownerNameList.add(name);
+        }
+    }
+
+    public void removeOwnerName(String name) {
+        int i = 0;
+        for(String owner : ownerNameList) {
+            if(owner.equals(name)) {
+                ownerNameList.remove(i);
+                break;
+            }
+            ++i;
+        }
+    }
+
     public String getEmeraldString() {
         int emeraldAmount = this.getEmeraldAmount() >= 999 ? 999 : this.getEmeraldAmount();
         int emeraldChange = this.getEmeraldChange();
@@ -165,21 +213,7 @@ public class AbacusScreenHandler extends ScreenHandler {
     }
 
     public boolean canBuyWith(int emeraldAmount, int emeraldChange, int tradeAmount) {
-        if(emeraldChange == 0){
-            emeraldAmount = emeraldAmount * tradeAmount;
-        }
-        else {
-            emeraldChange = emeraldChange * tradeAmount;
-            emeraldAmount += emeraldChange / 100;
-            emeraldChange = emeraldChange % 100;
-        }
-        if(this.getEmeraldAmount() > emeraldAmount) {
-            return true;
-        }
-        else if(getEmeraldChange() >= emeraldChange && this.getEmeraldAmount() >= emeraldAmount) {
-            return true;
-        }
-        return false;
+        return AbacusBlockEntity.canBuyWithAmount(emeraldAmount, emeraldChange, tradeAmount, this.getEmeraldAmount(), this.getEmeraldChange());
     }
 
     public int getMaxCanBuy(int emeraldAmount, int emeraldChange) {

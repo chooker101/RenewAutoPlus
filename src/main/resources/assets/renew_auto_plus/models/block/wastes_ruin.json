@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "renew_auto_plus:block/wastes_ruin_top",
+    "side": "renew_auto_plus:block/wastes_ruin_side"
+  }
+}

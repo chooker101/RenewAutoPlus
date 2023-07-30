@@ -10,12 +10,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.util.Identifier;
@@ -109,6 +107,74 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
             }
         }
     }
+
+    public void addItemToInventory(Item item, int amount) {
+        if(inventory.get(item) != null) {
+            inventory.put(item, inventory.get(item) + amount);
+        } else {
+            inventory.put(item, amount);
+        }
+    }
+
+    public void removeItemOrMaterialsFromInventory(Item removeItem, int amount) {
+        int amountNotNeededToBeCrafted = 0;
+        if(inventory.get(removeItem) != null) {
+            if(inventory.get(removeItem) - amount >= 0)
+            {
+                inventory.put(removeItem, inventory.get(removeItem) - amount);
+                return;
+            }
+            else if(inventory.get(removeItem) > 0) {
+                amountNotNeededToBeCrafted = inventory.get(removeItem);
+                inventory.put(removeItem, 0);
+            }
+        }
+        int alreadyUsedAmount = 0;
+        HashMap<Item, Integer> itemsUsed = new HashMap<>();
+        List<Recipe<?>> recipes = findCraftingRecipesFromId(removeItem);
+        for(Recipe<?> recipe : recipes) {
+            if (recipe != null) {
+                itemsUsed = new HashMap<>();
+                for(Ingredient ingredient : recipe.getIngredients()){
+                    if(ingredient.isEmpty()) continue;
+                    boolean hasAnIngredient = false;
+                    for(ItemStack item : ingredient.getMatchingStacks()) {
+                        alreadyUsedAmount = 0;
+                        if(itemsUsed.get(item.getItem()) != null) {
+                            alreadyUsedAmount = itemsUsed.get(item.getItem());
+                        }
+                        if(inventory.get(item.getItem()) == null) continue;
+                        if(inventory.get(item.getItem()) - alreadyUsedAmount >= (amount - amountNotNeededToBeCrafted)) {
+                            hasAnIngredient = true;
+                            if(itemsUsed.get(item.getItem()) != null) {
+                                itemsUsed.put(item.getItem(), itemsUsed.get(item.getItem()) + (amount - amountNotNeededToBeCrafted));
+                            }
+                            else {
+                                itemsUsed.put(item.getItem(), (amount - amountNotNeededToBeCrafted));
+                            }
+                            break;
+                        }
+                    }
+                    if(!hasAnIngredient) {
+                        break;
+                    }
+                }
+                for(HashMap.Entry<Item, Integer> entry : itemsUsed.entrySet()) {
+                    if(inventory.get(entry.getKey()) != null)
+                    {
+                        int difference = inventory.get(entry.getKey()) - entry.getValue();
+                        if(difference >= 0)
+                        {
+                            inventory.put(entry.getKey(), inventory.get(entry.getKey()) - entry.getValue());
+                        }
+                        else {
+                            inventory.put(entry.getKey(), 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
     
     public StallTradeList getStallTradeList(){
         if(this.stallTradeList == null){
@@ -116,6 +182,14 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
         }
         if(this.stallTradeList.isEmpty()) {
             fillTradeListFromPool();
+        }
+        else {
+            //Re Update the active list
+            for(StallTrade stallTrade : this.stallTradeList) {
+                int ownedAmount = getItemsForTrade(stallTrade);
+                stallTrade.setActive(ownedAmount > 0);
+                stallTrade.setMarketItemAmount(ownedAmount);
+            }
         }
         return this.stallTradeList;
     }
@@ -126,7 +200,9 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
                 for (StallTrades.ItemValueFactory factory : StallTrades.VILLAGER_TRADES.get(profession)) {
                     StallTrade tradeOffer = factory.create();
                     if (tradeOffer == null) continue;
-                    tradeOffer.setActive(isTradeActive(tradeOffer));
+                    int ownedAmount = getItemsForTrade(tradeOffer);
+                    tradeOffer.setActive(ownedAmount > 0);
+                    tradeOffer.setMarketItemAmount(ownedAmount);
                     stallTradeList.add(tradeOffer);
                 }
             }
@@ -134,45 +210,88 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
         for (StallTrades.ItemValueFactory factory : StallTrades.STALL_TRADES) {
             StallTrade tradeOffer = factory.create();
             if (tradeOffer == null) continue;
-            tradeOffer.setActive(isTradeActive(tradeOffer));
+            int ownedAmount = getItemsForTrade(tradeOffer);
+            tradeOffer.setActive(ownedAmount > 0);
+            tradeOffer.setMarketItemAmount(ownedAmount);
             stallTradeList.add(tradeOffer);
         }
     }
 
-    public Recipe<?> findCraftingRecipeFromId(ItemConvertible outputItem) {
-        return (Recipe<?>)world.getRecipeManager().values().stream().filter(r -> r.getOutput().getItem() == outputItem.asItem()).findFirst().map(Recipe::getId).orElse(null);
+    public List<Recipe<?>> findCraftingRecipesFromId(Item outputItem) {
+        return world.getRecipeManager().values().stream().filter(r -> r.getOutput().getItem().equals(outputItem)).toList();
     }
 
-    private boolean isTradeActive(StallTrade tradeOffer) {
+    public int getItemsForTrade(StallTrade tradeOffer) {
+        return getItemsForTrade(tradeOffer, 1);
+    }
+
+    public int getItemsForTrade(StallTrade tradeOffer, int amount) {
         Item tradeItem = tradeOffer.getTradedItem().getItem();
-        if(inventory == null) {
-            return false;
+        if(inventory == null || tradeItem == null) {
+            return 0;
         }
-        if(inventory.get(tradeItem) == null){
-            return false;
+        int amountNotNeededToBeCrafted = 0;
+        if(inventory.get(tradeItem) != null) {
+            amountNotNeededToBeCrafted = inventory.get(tradeItem);
         }
-        if(inventory.get(tradeItem) >= 1) {
-            return true;
-        }
-        else {
-            Recipe<?> recipe = findCraftingRecipeFromId(tradeItem);
-            if (recipe != null && recipe instanceof CraftingRecipe) {
-                CraftingRecipe craftingRecipe = (CraftingRecipe)recipe;
-                for(Ingredient ingredient : craftingRecipe.getIngredients()){
-                    boolean hasAnIngredient = false;
-                    for(ItemStack item : ingredient.getMatchingStacks()) {
-                        if(inventory.get(item.getItem()) >= 1) {
-                            hasAnIngredient = true;
-                        }
-                    }
-                    if(!hasAnIngredient) {
-                        return false;
-                    }
-                }
-                return true;
+        List<Recipe<?>> recipes = findCraftingRecipesFromId(tradeItem);
+        int howManyCanCraft = 0;
+        for (Recipe<?> recipe : recipes) {
+            if (recipe != null) {
+                howManyCanCraft += getHowManyCanCraft(recipe, amount);
             }
         }
-        return false;
+        return howManyCanCraft + amountNotNeededToBeCrafted;
+    }
+
+    private int getHowManyCanCraft(Recipe<?> recipe, int amount) {
+        if (recipe != null) {
+            HashMap<Item, Integer> itemsUsed = new HashMap<>();
+            int alreadyUsedAmount = 0;
+            for(Ingredient ingredient : recipe.getIngredients()){
+                if(ingredient.isEmpty()) continue;
+                boolean hasAnIngredient = false;
+                for(ItemStack item : ingredient.getMatchingStacks()) {
+                    alreadyUsedAmount = 0;
+                    if(itemsUsed.get(item.getItem()) != null) {
+                        alreadyUsedAmount = itemsUsed.get(item.getItem());
+                    }
+                    if(inventory.get(item.getItem()) == null) continue;
+                    if(inventory.get(item.getItem()) - alreadyUsedAmount >= amount) {
+                        hasAnIngredient = true;
+                        if(itemsUsed.get(item.getItem()) != null) {
+                            itemsUsed.put(item.getItem(), itemsUsed.get(item.getItem()) + amount);
+                        }
+                        else {
+                            itemsUsed.put(item.getItem(), amount);
+                        }
+                        break;
+                    }
+                }
+                if(!hasAnIngredient) {
+                    return 0;
+                }
+            }
+            int lowestIngredientMaxCrafts = Integer.MAX_VALUE;
+            for(HashMap.Entry<Item, Integer> entry : itemsUsed.entrySet()) {
+                if(inventory.get(entry.getKey()) != null)
+                {
+                    if(inventory.get(entry.getKey()) > 0){
+                        if((inventory.get(entry.getKey()) / entry.getValue()) < lowestIngredientMaxCrafts) {
+                            lowestIngredientMaxCrafts = inventory.get(entry.getKey()) / entry.getValue();
+                        }
+                    }
+                    else {
+                        return 0;
+                    }
+                }
+                else {
+                    return 0;
+                }
+            }
+            return lowestIngredientMaxCrafts;
+        }
+        return 0;
     }
 
     private static class JankyProfessionSerializer {

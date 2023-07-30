@@ -11,6 +11,8 @@ public class MarketManager {
     public final static int MAX_COMPANIES = 100;
     public final static int MAX_ATTACHED_CRATES = 20;
     public final static int MAX_AUTO_TRADES = 100;
+    public final static int MAX_ABACUS_OWNERS = 10;
+    public final static int MAX_MARKET_ITEM_STACK = 10000;
     public ArrayList<StallBlockEntity> allMarkets;
     public HashMap<String, AbacusBlockEntity> allCompanies;
     

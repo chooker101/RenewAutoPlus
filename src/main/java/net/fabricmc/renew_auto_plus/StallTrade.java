@@ -7,17 +7,23 @@ public class StallTrade {
     private final ItemStack tradedItem;
     private final int emeraldAmount;
     private final int emeraldChange;
-    private int itemAmount;
-    private boolean isActive; //Set on stall to determine if village has suplies for trade
+    private final int amountBeforeCommon;
+    private int companyItemAmount;
+    private int marketItemAmount;
+    private boolean isActive; //Set on stall to determine if village has suplies for trade, repurposed by auto trade for UI
     private boolean isSellable; //Set on abacus to determine if company has item to sell
+    private boolean isAutoTradeEnabled;
 
-    public StallTrade(ItemStack tradedItem, int emeraldAmount, int emeraldChange) {
+    public StallTrade(ItemStack tradedItem, int emeraldAmount, int emeraldChange, int amountBeforeCommon) {
         this.tradedItem = tradedItem;
         this.emeraldAmount = emeraldAmount;
         this.emeraldChange = emeraldChange;
-        itemAmount = 0;
+        this.amountBeforeCommon = amountBeforeCommon;
+        companyItemAmount = 0;
+        marketItemAmount = 0;
         isActive = true;
         isSellable = true;
+        isAutoTradeEnabled = false;
     }
 
     public ItemStack getTradedItem() {
@@ -32,50 +38,80 @@ public class StallTrade {
         return emeraldChange;
     }
 
-    public int getItemAmount() {
-        return itemAmount;
+    public int getAmountBeforeCommon() {
+        return amountBeforeCommon;
     }
 
-    public void setItemAmount(int amount) {
-        itemAmount = amount;
+    public int getCompanyItemAmount() {
+        return companyItemAmount;
+    }
+
+    public int getMarketItemAmount() {
+        return marketItemAmount;
     }
 
     public boolean isActive() {
         return isActive;
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
     public boolean isSellable() {
         return isSellable;
+    }
+
+    public boolean isAutoTradeEnabled() {
+        return isAutoTradeEnabled;
+    }
+
+    public void setCompanyItemAmount(int amount) {
+        companyItemAmount = amount;
+    }
+
+    public void setMarketItemAmount(int amount) {
+        marketItemAmount = amount;
+    }
+    
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public void setSellable(boolean sell) {
         isSellable = sell;
     }
 
+    public void setAutoTradeEnabled(boolean enabled) {
+        isAutoTradeEnabled = enabled;
+    }
+
     public void toPacket(PacketByteBuf buf) {
         buf.writeItemStack(this.getTradedItem());
-        buf.writeInt(this.getItemAmount());
-        buf.writeBoolean(this.isActive());
-        buf.writeBoolean(this.isSellable());
         buf.writeInt(this.getEmeraldAmount());
         buf.writeInt(this.getEmeraldChange());
+        buf.writeInt(this.getAmountBeforeCommon());
+        buf.writeInt(this.getCompanyItemAmount());
+        buf.writeInt(this.getMarketItemAmount());
+        buf.writeBoolean(this.isActive());
+        buf.writeBoolean(this.isSellable());
+        buf.writeBoolean(this.isAutoTradeEnabled());
+
     }
 
     public static StallTrade fromPacket(PacketByteBuf buf) {
         ItemStack itemStack = buf.readItemStack();
-        int itemAmount = buf.readInt();
-        boolean isActive = buf.readBoolean();
-        boolean isSellable = buf.readBoolean();
         int emeraldAmount = buf.readInt();
         int emeraldChange = buf.readInt();
-        StallTrade stallTrade = new StallTrade(itemStack, emeraldAmount, emeraldChange);
-        stallTrade.setItemAmount(itemAmount);
+        int amountBeforeCommon = buf.readInt();
+        int companyItemAmount = buf.readInt();
+        int marketItemAmount = buf.readInt();
+        boolean isActive = buf.readBoolean();
+        boolean isSellable = buf.readBoolean();
+        boolean isAutoTradeEnabled = buf.readBoolean();
+        StallTrade stallTrade = new StallTrade(itemStack, emeraldAmount, emeraldChange, amountBeforeCommon);
+        stallTrade.setCompanyItemAmount(companyItemAmount);
+        stallTrade.setMarketItemAmount(marketItemAmount);
         stallTrade.setActive(isActive);
         stallTrade.setSellable(isSellable);
+        stallTrade.setAutoTradeEnabled(isAutoTradeEnabled);
         return stallTrade;
     }
     

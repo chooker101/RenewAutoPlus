@@ -80,7 +80,7 @@ public class CrateScreen extends HandledScreen<CrateScreenHandler> {
             PacketByteBuf byteBuf = new PacketByteBuf(Unpooled.buffer());
             StringToCrateC2SPacket packet = new StringToCrateC2SPacket(handler.getBlockPos(), companyNameBox.getText());
             packet.write(byteBuf);
-            this.client.getNetworkHandler().sendPacket(ClientPlayNetworking.createC2SPacket(RenewAutoPlusInitialize.CrateStringPacketID, byteBuf));
+            this.client.getNetworkHandler().sendPacket(ClientPlayNetworking.createC2SPacket(RenewAutoPlusInitialize.CRATE_STRING_PACKET_ID, byteBuf));
             this.client.interactionManager.clickButton(((CrateScreenHandler)this.handler).syncId, 0);
             return true;
         }
