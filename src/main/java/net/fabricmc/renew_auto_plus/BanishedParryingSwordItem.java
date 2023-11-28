@@ -43,7 +43,7 @@ public class BanishedParryingSwordItem extends ToolItem {
     private final float attackDamage;
     private final Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
 
-    private int cooldownTime = 0;
+    private int cooldownTime = 0; //didn't know ItemCooldownManger existed, need to change
     private int maxUseTime = 11;
 
     public BanishedParryingSwordItem(ToolMaterial toolMaterial, int attackDamage, float attackSpeed, Item.Settings settings) {
@@ -77,7 +77,6 @@ public class BanishedParryingSwordItem extends ToolItem {
             return TypedActionResult.pass(itemStack);
         }
         else {
-            
             if(!world.isClient()) {
                 maxUseTime = 6;
                 user.setCurrentHand(hand);
@@ -121,6 +120,9 @@ public class BanishedParryingSwordItem extends ToolItem {
     @Override
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
         cooldownTime = 14;
+        if(user instanceof PlayerEntity) {
+            ((PlayerEntity)user).getItemCooldownManager().set(this, 14);
+        }
         user.clearActiveItem();
         return stack;
     }

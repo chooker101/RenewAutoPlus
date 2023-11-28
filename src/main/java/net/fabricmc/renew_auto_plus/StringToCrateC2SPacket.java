@@ -33,7 +33,7 @@ implements Packet<ServerPlayPacketListener> {
         if(handler == null) {
             return;
         }
-        StringToCratePlayChannelHandler.onStringToBlockEntity(handler.player, handler, this);
+        StringToCratePlayChannelHandler.onStringToCrate(handler.player, handler, this);
     }
 
     public BlockPos getBlockPos() {

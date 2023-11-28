@@ -6,7 +6,11 @@
   "mixins": [
     "PickaxeItemExtension",
     "FurnaceBlockExtension",
-    "LivingEntityExtension"
+    "LivingEntityExtension",
+    "MinecraftClientExtension",
+    "LivingEntityRendererExtension",
+    "InGameHudExtension",
+    "PlayerEntityExtension"
   ],
   "client": [],
   "server": [],

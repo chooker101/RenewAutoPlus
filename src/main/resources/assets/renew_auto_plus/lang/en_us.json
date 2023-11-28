@@ -14,6 +14,9 @@
     "item.renew_auto_plus.banished_sword_clear": "Banished Sword (Clear)",
     "item.renew_auto_plus.banished_parrying_sword": "Banished Parrying Sword",
     "item.renew_auto_plus.banished_parrying_sword_clear": "Banished Parrying Sword (Clear)",
+    "item.renew_auto_plus.amethyst_wand": "Amethyst Wand",
+    "item.renew_auto_plus.aquamarine_wand": "Aquamarine Wand",
+    "item.renew_auto_plus.spice": "Spice",
     "item.renew_auto_plus.lettuce": "Lettuce",
     "block.renew_auto_plus.smelter": "Smelter",
     "container.smelter": "Smelter",
@@ -32,5 +35,7 @@
     "renew_auto_plus.abacus_tab.settings": "Settings",
     "renew_auto_plus.abacus_tab.inventory": "Inventory",
     "effect.minecraft.big_dick": "You got a Big Dick",
-    "subtitles.renew_auto_plus.extractor_on": "Extractor whirs"
+    "subtitles.renew_auto_plus.extractor_on": "Extractor whirs",
+    "death.attack.directMagic": "%1$s was killed by %2$s using magic",
+    "death.attack.directMagic.item": "%1$s was killed by %2$s using %3$s"
 }

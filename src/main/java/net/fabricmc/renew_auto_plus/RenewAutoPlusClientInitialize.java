@@ -28,6 +28,10 @@ public class RenewAutoPlusClientInitialize implements ClientModInitializer {
         BlockEntityRendererRegistry.register(RenewAutoPlusInitialize.PUMP_BLOCK_ENTITY, PumpBlockEntityRender::new);
 
         EntityRendererRegistry.register(RenewAutoPlusInitialize.BANISHED_ENTITY, BanishedEntityRender::new);
+        EntityRendererRegistry.register(RenewAutoPlusInitialize.AMETHYST_BASIC_PROJECTILE_ENTITY, AmethystBasicProjectileEntityRender::new);
+        EntityRendererRegistry.register(RenewAutoPlusInitialize.AQUAMARINE_BASIC_PROJECTILE_ENTITY, AquamarineBasicProjectileEntityRender::new);
+        EntityRendererRegistry.register(RenewAutoPlusInitialize.AQUAMARINE_SPECIAL_PROJECTILE_ENTITY, AquamarineSpecialProjectileEntityRender::new);
+        EntityRendererRegistry.register(RenewAutoPlusInitialize.RUBY_BASIC_PROJECTILE_ENTITY, RubyBasicProjectileEntityRender::new);
 
         BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(), RenewAutoPlusInitialize.LETTUCE_BLOCK);
     }

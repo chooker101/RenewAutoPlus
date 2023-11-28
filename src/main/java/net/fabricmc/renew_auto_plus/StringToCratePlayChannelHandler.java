@@ -21,7 +21,7 @@ public class StringToCratePlayChannelHandler implements PlayChannelHandler {
         }
     }
 
-    public static void onStringToBlockEntity(ServerPlayerEntity player, ServerPlayNetworkHandler handler, StringToCrateC2SPacket packet) {
+    public static void onStringToCrate(ServerPlayerEntity player, ServerPlayNetworkHandler handler, StringToCrateC2SPacket packet) {
         if(player.world != null) {
             CrateBlockEntity crateBlockEntity = null;
             BlockEntity blockEntity = player.world.getBlockEntity(packet.getBlockPos());

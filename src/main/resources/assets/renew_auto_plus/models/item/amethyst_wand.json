@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "renew_auto_plus:item/amethyst_wand"
+  }
+}
