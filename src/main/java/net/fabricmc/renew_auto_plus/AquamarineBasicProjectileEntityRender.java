@@ -50,7 +50,7 @@ public class AquamarineBasicProjectileEntityRender extends EntityRenderer<Aquama
         this.vertex(matrix4f, matrix3f, t, -5, 2, 2, 0.15625f, 0.15625f, 1, 0, 0, i);
         this.vertex(matrix4f, matrix3f, t, -5, -2, 2, 0.15625f, 0.3125f, 1, 0, 0, i);
         this.vertex(matrix4f, matrix3f, t, -5, -2, -2, 0.0f, 0.3125f, 1, 0, 0, i);
-        for (int u = 0; u < 4; ++u) {
+        for (int u = 0; u < 2; ++u) {
             matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
             this.vertex(matrix4f, matrix3f, t, -8, -2, 0, 0.0f, 0.0f, 0, 1, 0, i);
             this.vertex(matrix4f, matrix3f, t, 8, -2, 0, 0.5f, 0.0f, 0, 1, 0, i);

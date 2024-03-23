@@ -12,11 +12,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class CrateBlock extends BlockWithEntity {
-    //public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     protected CrateBlock(Settings settings) {
         super(settings);
-        //setDefaultState(this.stateManager.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
     @Override

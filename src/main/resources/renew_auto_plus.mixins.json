@@ -10,7 +10,12 @@
     "MinecraftClientExtension",
     "LivingEntityRendererExtension",
     "InGameHudExtension",
-    "PlayerEntityExtension"
+    "PlayerEntityExtension",
+    "TridentRiptideFeatureRenderExtension",
+    "HeldItemRendererExtension",
+    "HeldItemFeatureRendererExtension",
+    "PlayerEntityRendererExtension",
+    "EntityExtension"
   ],
   "client": [],
   "server": [],

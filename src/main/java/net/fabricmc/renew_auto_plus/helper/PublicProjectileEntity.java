@@ -1,6 +1,7 @@
 package net.fabricmc.renew_auto_plus.helper;
 
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -9,6 +10,7 @@ import com.google.common.base.MoreObjects;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
@@ -20,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
@@ -242,5 +245,21 @@ public abstract class PublicProjectileEntity extends Entity {
             return entity.canModifyAt(world, pos);
         }
         return entity == null || world.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING);
+    }
+
+    public static HitResult getCollision(Entity entity, Predicate<Entity> predicate) {
+        EntityHitResult hitResult2;
+        Vec3d vec3d3;
+        Vec3d vec3d = entity.getVelocity();
+        World world = entity.world;
+        Vec3d vec3d2 = entity.getPos();
+        HitResult hitResult = world.raycast(new RaycastContext(vec3d2, vec3d3 = vec3d2.add(vec3d), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
+        if (((HitResult)hitResult).getType() != HitResult.Type.MISS) {
+            vec3d3 = hitResult.getPos();
+        }
+        if ((hitResult2 = ProjectileUtil.getEntityCollision(world, entity, vec3d2, vec3d3, entity.getBoundingBox().stretch(entity.getVelocity()), predicate, 0.3f)) != null) {
+            hitResult = hitResult2;
+        }
+        return hitResult;
     }
 }

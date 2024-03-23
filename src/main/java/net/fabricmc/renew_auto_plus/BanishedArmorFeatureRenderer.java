@@ -60,15 +60,31 @@ extends FeatureRenderer<T, M> {
         if(entity instanceof BanishedEntity) {
             a = ((BanishedEntity)entity).getArmorAlpha();
         }
+        else if (entity instanceof GhostBanishedEntity) {
+            a = ((GhostBanishedEntity)entity).getArmorAlpha();
+        }
         if (armorItem instanceof DyeableArmorItem) {
             int i = ((DyeableArmorItem)armorItem).getColor(itemStack);
             float f = (float)(i >> 16 & 0xFF) / 255.0f;
             float g = (float)(i >> 8 & 0xFF) / 255.0f;
             float h = (float)(i & 0xFF) / 255.0f;
+            if (entity instanceof GhostBanishedEntity) {
+                f = 0.9412f;
+                g = 0.3647f;
+                h = 0.9255f;
+            }
             this.renderArmorParts(matrices, vertexConsumers, light, armorItem, bl2, model, bl, f, g, h, a, null);
             this.renderArmorParts(matrices, vertexConsumers, light, armorItem, bl2, model, bl, 1.0f, 1.0f, 1.0f, a, "overlay");
         } else {
-            this.renderArmorParts(matrices, vertexConsumers, light, armorItem, bl2, model, bl, 1.0f, 1.0f, 1.0f, a, null);
+            float f = 1.0f;
+            float g = 1.0f;
+            float h = 1.0f;
+            if (entity instanceof GhostBanishedEntity) {
+                f = 0.9412f;
+                g = 0.3647f;
+                h = 0.9255f;
+            }
+            this.renderArmorParts(matrices, vertexConsumers, light, armorItem, bl2, model, bl, f, g, h, a, null);
         }
     }
 

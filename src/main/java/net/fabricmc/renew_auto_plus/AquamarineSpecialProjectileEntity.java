@@ -41,6 +41,9 @@ public class AquamarineSpecialProjectileEntity extends AbstractMagicProjectileEn
                 ((LivingEntity)entity).addStatusEffect(new StatusEffectInstance(RenewAutoPlusInitialize.ICEBOUND, 100, 1), owner);
             }
         }
+        if(owner instanceof LivingEntity) {
+            ((LivingEntity)owner).onAttacking(entity);
+        }
         this.discard();
         this.setOwner(null);
     }

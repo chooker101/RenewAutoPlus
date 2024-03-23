@@ -33,6 +33,7 @@ public class RubyBasicProjectileEntityRender extends EntityRenderer<RubyBasicPro
     @Override
     public void render(RubyBasicProjectileEntity magicEntity, float yaw, float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         matrixStack.push();
+        matrixStack.translate(0.0, 0.15, 0.0);
         matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(MathHelper.lerp(tickDelta, magicEntity.prevYaw, magicEntity.getYaw()) - 90.0f));
         matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(MathHelper.lerp(tickDelta, magicEntity.prevPitch, magicEntity.getPitch())));
         matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(45.0f));
@@ -41,24 +42,61 @@ public class RubyBasicProjectileEntityRender extends EntityRenderer<RubyBasicPro
         MatrixStack.Entry entry = matrixStack.peek();
         Matrix4f matrix4f = entry.getPositionMatrix();
         Matrix3f matrix3f = entry.getNormalMatrix();
-        //if(magicEntity.currentSize == RubyBasicProjectileEntity.Size.SMALL){
+        RubyBasicProjectileEntity.Size size = magicEntity.getCurrentSize();
+        if(size == RubyBasicProjectileEntity.Size.LARGE) {
             matrixStack.translate(-4.0, 0.0, 0.0);
-            this.vertex(matrix4f, matrix3f, t, -5, -2, -2, 0.0f, 0.05208f, -1, 0, 0, i);
-            this.vertex(matrix4f, matrix3f, t, -5, -2, 2, 0.05208f, 0.05208f, -1, 0, 0, i);
-            this.vertex(matrix4f, matrix3f, t, -5, 2, 2, 0.05208f, 0.3125f, -1, 0, 0, i);
-            this.vertex(matrix4f, matrix3f, t, -5, 2, -2, 0.0f, 0.3125f, -1, 0, 0, i);
-            this.vertex(matrix4f, matrix3f, t, -5, 2, -2, 0.0f, 0.05208f, 1, 0, 0, i);
-            this.vertex(matrix4f, matrix3f, t, -5, 2, 2, 0.05208f, 0.05208f, 1, 0, 0, i);
-            this.vertex(matrix4f, matrix3f, t, -5, -2, 2, 0.05208f, 0.3125f, 1, 0, 0, i);
-            this.vertex(matrix4f, matrix3f, t, -5, -2, -2, 0.0f, 0.3125f, 1, 0, 0, i);
-            for (int u = 0; u < 4; ++u) {
+            this.vertex(matrix4f, matrix3f, t, 8, -7, -7, 0.0f, 0.78125f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 8, -7, 7, 0.34375f, 0.78125f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 8, 7, 7, 0.34375f, 0.8958f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 8, 7, -7, 0.0f, 0.8958f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 8, 7, -7, 0.0f, 0.78125f, 1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 8, 7, 7, 0.34375f, 0.78125f, 1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 8, -7, 7, 0.34375f, 0.8958f, 1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 8, -7, -7, 0.0f, 0.8958f, 1, 0, 0, i);
+            for (int u = 0; u < 2; ++u) {
                 matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
-                this.vertex(matrix4f, matrix3f, t, -8, -2, 0, 0.0f, 0.0f, 0, 1, 0, i);
-                this.vertex(matrix4f, matrix3f, t, 8, -2, 0, 0.5f, 0.0f, 0, 1, 0, i);
-                this.vertex(matrix4f, matrix3f, t, 8, 2, 0, 0.5f, 0.05208f, 0, 1, 0, i);
-                this.vertex(matrix4f, matrix3f, t, -8, 2, 0, 0.0f, 0.05208f, 0, 1, 0, i);
+                this.vertex(matrix4f, matrix3f, t, -15, -7, 0, 0.0f, 0.6666f, 0, 1, 0, i);
+                this.vertex(matrix4f, matrix3f, t, 15, -7, 0, 0.6875f, 0.6666f, 0, 1, 0, i);
+                this.vertex(matrix4f, matrix3f, t, 15, 7, 0, 0.6875f, 0.78125f, 0, 1, 0, i);
+                this.vertex(matrix4f, matrix3f, t, -15, 7, 0, 0.0f, 0.78125f, 0, 1, 0, i);
             }
-        //}
+        }
+        else if(size == RubyBasicProjectileEntity.Size.MEDIUM) {
+            matrixStack.translate(-4.0, 0.0, 0.0);
+            this.vertex(matrix4f, matrix3f, t, 5, -5, -5, 0.0f, 0.40625f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 5, -5, 5, 0.21875f, 0.40625f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 5, 5, 5, 0.21875f, 0.4792f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 5, 5, -5, 0.0f, 0.4792f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 5, 5, -5, 0.0f, 0.40625f, 1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 5, 5, 5, 0.21875f, 0.40625f, 1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 5, -5, 5, 0.21875f, 0.4792f, 1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 5, -5, -5, 0.0f, 0.4792f, 1, 0, 0, i);
+            for (int u = 0; u < 2; ++u) {
+                matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
+                this.vertex(matrix4f, matrix3f, t, -10, -5, 0, 0.0f, 0.3333f, 0, 1, 0, i);
+                this.vertex(matrix4f, matrix3f, t, 10, -5, 0, 0.5f, 0.3333f, 0, 1, 0, i);
+                this.vertex(matrix4f, matrix3f, t, 10, 5, 0, 0.5f, 0.40625f, 0, 1, 0, i);
+                this.vertex(matrix4f, matrix3f, t, -10, 5, 0, 0.0f, 0.40625f, 0, 1, 0, i);
+            }
+        }
+        else {
+            matrixStack.translate(-4.0, 0.0, 0.0);
+            this.vertex(matrix4f, matrix3f, t, 3, -2, -2, 0.0f, 0.05208f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 3, -2, 2, 0.15625f, 0.05208f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 3, 2, 2, 0.15625f, 0.1042f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 3, 2, -2, 0.0f, 0.1042f, -1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 3, 2, -2, 0.0f, 0.05208f, 1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 3, 2, 2, 0.15625f, 0.05208f, 1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 3, -2, 2, 0.15625f, 0.1042f, 1, 0, 0, i);
+            this.vertex(matrix4f, matrix3f, t, 3, -2, -2, 0.0f, 0.1042f, 1, 0, 0, i);
+            for (int u = 0; u < 2; ++u) {
+                matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
+                this.vertex(matrix4f, matrix3f, t, -6, -2, 0, 0.0f, 0.0f, 0, 1, 0, i);
+                this.vertex(matrix4f, matrix3f, t, 6, -2, 0, 0.5f, 0.0f, 0, 1, 0, i);
+                this.vertex(matrix4f, matrix3f, t, 6, 2, 0, 0.5f, 0.05208f, 0, 1, 0, i);
+                this.vertex(matrix4f, matrix3f, t, -6, 2, 0, 0.0f, 0.05208f, 0, 1, 0, i);
+            }
+        }
         matrixStack.pop();
         super.render(magicEntity, yaw, tickDelta, matrixStack, vertexConsumerProvider, i);
     }

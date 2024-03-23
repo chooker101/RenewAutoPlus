@@ -8,8 +8,11 @@ import com.google.common.collect.Multimap;
 
 import net.fabricmc.renew_auto_plus.helper.AttackActionReplacedWithCharge;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.MovementType;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,16 +21,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 
 public class RubyWandItem extends RangedWeaponItem implements AttackActionReplacedWithCharge {
     public final Random random = new Random();
+    public int chargeAnimationFrame = 0;
     private final Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
     private final int maxAttackTicks = 16;
     private int currentAttackTicks = maxAttackTicks;
     private boolean onCooldown = false;
+    
 
     public RubyWandItem(Item.Settings settings) {
         super(settings);
@@ -55,11 +61,11 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-        boolean bl = user.getArrowType(itemStack).getCount() >= 2;
-        user.getItemCooldownManager().set(this, 40);
+        boolean bl = user.getArrowType(itemStack).getCount() >= 3;
+        user.getItemCooldownManager().set(this, 60);
         if (user.getAbilities().creativeMode || bl) {
             user.setCurrentHand(hand);
-            AquamarineWandItem.shootSpecialAttack(world, user, hand, itemStack, AquamarineWandItem.getSpeed(), AquamarineWandItem.getDivergence());
+            RubyWandItem.shootSpecialAttack(world, user, hand, itemStack, RubyWandItem.getSpeed(), RubyWandItem.getDivergence());
             return TypedActionResult.success(itemStack);
         }
         return TypedActionResult.fail(itemStack);
@@ -83,8 +89,7 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
         projectileEntity.setVelocity(vec3f.getX(), vec3f.getY(), vec3f.getZ(), speed, divergence);
         projectileEntity.setPosition(user.getX() + vec3f.getX(), (user.getEyeY() - 0.15) + vec3f.getY(), user.getZ() + vec3f.getZ());
         float attackCooldownPercentage = ((RubyWandItem)wand.getItem()).getAttackCooldownPercentage();
-        RenewAutoPlusInitialize.LOGGER.info("attackCooldownPercentage: {}", attackCooldownPercentage);
-        if(attackCooldownPercentage > 0.6f) {
+        if(attackCooldownPercentage > 0.4f) {
             projectileEntity.setCurrentSize(RubyBasicProjectileEntity.Size.SMALL);
         }
         else if(attackCooldownPercentage > 0.125f) {
@@ -102,21 +107,24 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
     }
 
     public static void shootSpecialAttack(World world, PlayerEntity user, Hand hand, ItemStack wand, float speed, float divergence) {
-        if (world.isClient) {
-            return;
+        float tridentEntity = user.getYaw();
+        float f = user.getPitch();
+        float g = -MathHelper.sin(tridentEntity * ((float)Math.PI / 180)) * MathHelper.cos(f * ((float)Math.PI / 180));
+        float h = -MathHelper.sin(f * ((float)Math.PI / 180));
+        float k = MathHelper.cos(tridentEntity * ((float)Math.PI / 180)) * MathHelper.cos(f * ((float)Math.PI / 180));
+        float l = MathHelper.sqrt(g * g + h * h + k * k);
+        float m = 2.0f;
+        user.addVelocity(g *= m / l, h *= m / l, k *= m / l);
+        user.setRiptideTicks(18);
+        user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 120, 1));
+        if (user.isOnGround()) {
+            user.move(MovementType.SELF, new Vec3d(0.0, 1.1999999284744263, 0.0));
         }
-        Vec3d vec3d = user.getRotationVec(1.0f);
-        Vec3f vec3f = new Vec3f(vec3d);
-        final float specialSpeed = 0.5f;
-        AquamarineSpecialProjectileEntity projectileEntity = new AquamarineSpecialProjectileEntity(world, user, vec3f.getX(), vec3f.getY(), vec3f.getZ());
-        projectileEntity.setVelocity(vec3f.getX(), vec3f.getY(), vec3f.getZ(), specialSpeed, divergence);
-        projectileEntity.setPosition(user.getX() + vec3f.getX(), (user.getEyeY() - 0.15) + vec3f.getY(), user.getZ() + vec3f.getZ());
         wand.damage(1, user, e -> e.sendToolBreakStatus(hand));
         if (!user.getAbilities().creativeMode) {
-            user.getArrowType(wand).decrement(2);
+            user.getArrowType(wand).decrement(3);
         }
-        world.spawnEntity(projectileEntity);
-        //world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1.0f, soundPitch);
+        //world.playSoundFromEntity(null, user, SoundEvents.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 1.0f, 1.0f);
     }
 
     @Override
@@ -130,16 +138,25 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
         if(currentAttackTicks < maxAttackTicks) {
             currentAttackTicks++;
         }
+        if(getAttackCooldownPercentage() < 1.0f && canAttack()) {
+            if(chargeAnimationFrame < 20) {
+                chargeAnimationFrame++;
+            }
+            else {
+                chargeAnimationFrame = 9;
+            }
+        }
+        else {
+            chargeAnimationFrame = 0;
+        }
     }
 
     @Override
     public void onAttackServer(World world, PlayerEntity user, Hand hand) {
-        
     }
 
     @Override
     public void onAttackClient(World world, PlayerEntity user, Hand hand) {
-        //user.swingHand(Hand.MAIN_HAND);
         if(currentAttackTicks > 0 && !onCooldown) {
             if(currentAttackTicks > 1){
                 currentAttackTicks -= 2;
@@ -154,6 +171,10 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
         return !onCooldown;
     }
 
+    public boolean canAttack() {
+        return !onCooldown;
+    }
+
     @Override
     public float getAttackCooldownPercentage() {
         return (float)currentAttackTicks / (float)maxAttackTicks;
@@ -162,7 +183,6 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
     @Override
     public void stopAttackServer(World world, PlayerEntity user, Hand hand) {
         if(currentAttackTicks < maxAttackTicks){
-            RenewAutoPlusInitialize.LOGGER.info("SERVER currentAttackTicks: {}", currentAttackTicks);
             ItemStack itemStack = user.getStackInHand(hand);
             boolean bl = !user.getArrowType(itemStack).isEmpty();
             if (user.getAbilities().creativeMode || bl) {
@@ -174,7 +194,6 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
 
     @Override
     public void stopAttackClient(World world, PlayerEntity user, Hand hand) {
-        RenewAutoPlusInitialize.LOGGER.info("CLIENT currentAttackTicks: {}", currentAttackTicks);
         user.swingHand(Hand.MAIN_HAND);
         onCooldown = true;
     }

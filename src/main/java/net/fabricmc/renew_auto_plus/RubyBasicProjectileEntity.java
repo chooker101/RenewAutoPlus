@@ -24,7 +24,6 @@ public class RubyBasicProjectileEntity extends AbstractMagicProjectileEntity {
         LARGE
     };
     protected static final TrackedData<Byte> TRACKED_SIZE = DataTracker.registerData(RubyBasicProjectileEntity.class, TrackedDataHandlerRegistry.BYTE);
-    //public Size currentSize = Size.SMALL;
 
     public RubyBasicProjectileEntity(EntityType<? extends AbstractMagicProjectileEntity> entityType, World world) {
         super(entityType, world);
@@ -84,10 +83,10 @@ public class RubyBasicProjectileEntity extends AbstractMagicProjectileEntity {
                 entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 2.0f);
                 break;
             case MEDIUM:
-                entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 8.0f);
+                entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 7.0f);
                 break;
             case LARGE:
-                entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 12.0f);
+                entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 9.0f);
                 break;
             default:
                 break;
@@ -96,6 +95,9 @@ public class RubyBasicProjectileEntity extends AbstractMagicProjectileEntity {
             if(!((LivingEntity)entity).isOnFire()){
                 ((LivingEntity)entity).setOnFireFor(3);
             }
+        }
+        if(owner instanceof LivingEntity) {
+            ((LivingEntity)owner).onAttacking(entity);
         }
         this.discard();
         this.setOwner(null);
@@ -118,7 +120,7 @@ public class RubyBasicProjectileEntity extends AbstractMagicProjectileEntity {
 
     @Override
     protected float getDrag() {
-        return 1.0f;
+        return 0.85f;
     }
 
     @Override
@@ -153,9 +155,6 @@ public class RubyBasicProjectileEntity extends AbstractMagicProjectileEntity {
 
     @Override
     protected Box calculateBoundingBox() {
-        //double f = this.getType().getHeight();
-        //double g = this.getType().getWidth() / 2.0;
-        //Box boundingBox = new Box(BlockPos.ORIGIN).offset(this.getX() - g, this.getY() - f, this.getZ() - g);
         Box boundingBox = this.getDimensions(getPose()).getBoxAt(this.getPos());
         Size currentSize = this.getCurrentSize();
         if(currentSize == null) {
@@ -166,16 +165,21 @@ public class RubyBasicProjectileEntity extends AbstractMagicProjectileEntity {
             case SMALL:
                 break;
             case MEDIUM:
-                boundingBox = boundingBox.expand(0.5, 0.5, 0.5);
+                boundingBox = boundingBox.expand(0.25, 0.25, 0.25);
                 break;
             case LARGE:
-                boundingBox = boundingBox.expand(1.0, 1.0, 1.0);
+                boundingBox = boundingBox.expand(0.5, 0.5, 0.5);
                 break;
             default:
                 break;
         }
-        RenewAutoPlusInitialize.LOGGER.info("currentSize: {}", currentSize);
         this.setBoundingBox(boundingBox);
         return boundingBox;
     }
+
+    @Override
+    protected boolean useDoubleCollision() {
+        return true;
+    }
+
 }

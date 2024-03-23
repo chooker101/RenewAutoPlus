@@ -42,6 +42,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 
 import java.util.concurrent.ExecutorService;
@@ -63,6 +64,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 public class RenewAutoPlusInitialize implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger("RenewAutoPlus");
 	public static final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
+	public static BlockPos wastesSpawnPos = null;
 
 	public static final ToolItem COPPER_AXE = new CustomAxeItem(CopperToolMaterial.INSTANCE, 6.0f, -3.2F, new Item.Settings().group(ItemGroup.TOOLS));
 	public static final ToolItem COPPER_HOE = new CustomHoeItem(CopperToolMaterial.INSTANCE, -2, -1.0F, new Item.Settings().group(ItemGroup.TOOLS));
@@ -76,6 +78,8 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 	public static final AmethystWandItem AMETHYST_WAND = new AmethystWandItem(new Item.Settings().group(ItemGroup.COMBAT).maxDamage(750));
 	public static final AquamarineWandItem AQUAMARINE_WAND = new AquamarineWandItem(new Item.Settings().group(ItemGroup.COMBAT).maxDamage(750));
 	public static final RubyWandItem RUBY_WAND = new RubyWandItem(new Item.Settings().group(ItemGroup.COMBAT).maxDamage(750));
+	public static final TopazWandItem TOPAZ_WAND = new TopazWandItem(new Item.Settings().group(ItemGroup.COMBAT).maxDamage(750));
+	public static final OnyxWandItem ONYX_WAND = new OnyxWandItem(new Item.Settings().group(ItemGroup.COMBAT).maxDamage(750));
 
 	public static final Item BANISHED_HELMET = new ArmorItem(BanishedArmorMaterial.INSTANCE, EquipmentSlot.HEAD, new Item.Settings());
 	public static final Item BANISHED_CHESTPLATE = new ArmorItem(BanishedArmorMaterial.INSTANCE, EquipmentSlot.CHEST, new Item.Settings());
@@ -113,6 +117,7 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 			}
 		}
 	});
+	public static final StatusEffect CHARGED = Registry.register(Registry.STATUS_EFFECT, "charged", new PublicStatusEffect(StatusEffectCategory.BENEFICIAL, 0xF58442));
 	
 	public static final FoodComponent LETTUCE_FOOD_COMPONENT = new FoodComponent.Builder().hunger(4).saturationModifier(0.3f).statusEffect(new StatusEffectInstance(BIG_DICK, 200, 0), 0.3f).build();
 
@@ -132,6 +137,11 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 	public static final Block WHITE_SAND = new SandBlock(0xf4f5ebff, FabricBlockSettings.of(Material.AGGREGATE, MapColor.WHITE).strength(0.5f).sounds(BlockSoundGroup.SAND));
 	public static final Block WHITE_SANDSTONE = new Block(FabricBlockSettings.of(Material.STONE, MapColor.WHITE).requiresTool().strength(0.8f));
 	public static final Block WASTES_RUIN = new PillarBlock(FabricBlockSettings.of(Material.STONE, MapColor.RED).requiresTool().strength(0.8f));
+	public static final Block WASTES_PORTAL_FRAME = new WastesPortalFrameBlock(FabricBlockSettings.of(Material.STONE, MapColor.DULL_RED).requiresTool().strength(0.8f).luminance(state -> state.get(Properties.POWERED) ? 13 : 0).nonOpaque());
+	public static final Block WASTES_PORTAL_CONTROLLER = new WastesPortalControllerBlock(FabricBlockSettings.of(Material.STONE, MapColor.DULL_RED).requiresTool().strength(0.8f));
+	public static final Block RUINED_WASTES_PORTAL_FRAME = new WastesPortalFrameBlock(FabricBlockSettings.of(Material.STONE, MapColor.DULL_RED).requiresTool().strength(0.8f).luminance(state -> state.get(Properties.POWERED) ? 13 : 0).nonOpaque());
+	public static final Block RUINED_WASTES_PORTAL_CONTROLLER = new RuinedWastesPortalControllerBlock(FabricBlockSettings.of(Material.STONE, MapColor.DULL_RED).requiresTool().strength(0.8f));
+	public static final Block WASTES_PORTAL_SURFACE = new WastesPortalSurfaceBlock(FabricBlockSettings.of(Material.PORTAL, MapColor.BLACK).noCollision().strength(-1.0f, 3600000.0f).dropsNothing());
 	public static final Block TERRACOTTA_COAL_ORE = new OreBlock(FabricBlockSettings.of(Material.STONE, MapColor.TERRACOTTA_RED).requiresTool().strength(2.0f, 3.0f),  UniformIntProvider.create(0, 2));
 	public static final Block TERRACOTTA_IRON_ORE = new OreBlock(FabricBlockSettings.of(Material.STONE, MapColor.TERRACOTTA_RED).requiresTool().strength(2.0f, 3.0f));
 	public static final Block TERRACOTTA_GOLD_ORE = new OreBlock(FabricBlockSettings.of(Material.STONE, MapColor.TERRACOTTA_RED).requiresTool().strength(2.0f, 3.0f));
@@ -147,6 +157,7 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 	public static final ScreenHandlerType<PumpScreenHandler> PUMP_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier("renew_auto_plus", "pump"), PumpScreenHandler::new);
 	public static final ScreenHandlerType<AbacusScreenHandler> ABACUS_SCREEN_HANDLER = ScreenHandlerRegistry.registerExtended(new Identifier("renew_auto_plus", "abacus"), AbacusScreenHandler::new);
 	public static final ScreenHandlerType<CrateScreenHandler> CRATE_SCREEN_HANDLER = ScreenHandlerRegistry.registerExtended(new Identifier("renew_auto_plus", "crate"), CrateScreenHandler::new);
+	public static final ScreenHandlerType<WastesPortalControllerScreenHandler> WASTES_PORTAL_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier("renew_auto_plus", "wastes_portal_controller"), WastesPortalControllerScreenHandler::new);
 
 	public static final BlockEntityType<FurnaceBlockEntityReplacement> FURNACE_BLOCK_ENTITY_REPLACEMENT = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("renew_auto_plus", "furnace_entity_replacement"), FabricBlockEntityTypeBuilder.create(FurnaceBlockEntityReplacement::new, Blocks.FURNACE, SMELTER).build());
 	public static final BlockEntityType<ExtractorBlockEntity> EXTRACTOR_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("renew_auto_plus", "extractor_block_entity"), FabricBlockEntityTypeBuilder.create(ExtractorBlockEntity::new, EXTRACTOR).build());
@@ -157,14 +168,21 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 	public static final BlockEntityType<AbacusBlockEntity> ABACUS_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("renew_auto_plus", "abacus_entity"), FabricBlockEntityTypeBuilder.create(AbacusBlockEntity::new, ABACUS).build());
 	public static final BlockEntityType<StallBlockEntity> STALL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("renew_auto_plus", "stall_entity"), FabricBlockEntityTypeBuilder.create(StallBlockEntity::new, STALL).build());
 	public static final BlockEntityType<CrateBlockEntity> CRATE_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("renew_auto_plus", "crate_entity"), FabricBlockEntityTypeBuilder.create(CrateBlockEntity::new, CRATE).build());
+	public static final BlockEntityType<WastesPortalControllerBlockEntity> WASTES_PORTAL_CONTROLLER_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("renew_auto_plus", "wastes_portal_controller_entity"), FabricBlockEntityTypeBuilder.create(WastesPortalControllerBlockEntity::new, WASTES_PORTAL_CONTROLLER).build());
+	public static final BlockEntityType<WastesPortalSurfaceBlockEntity> WASTES_PORTAL_SURFACE_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier("renew_auto_plus", "wastes_portal_surface_entity"), FabricBlockEntityTypeBuilder.create(WastesPortalSurfaceBlockEntity::new, WASTES_PORTAL_SURFACE).build());
 
 	public static final EntityType<AmethystBasicProjectileEntity> AMETHYST_BASIC_PROJECTILE_ENTITY =  Registry.register(Registry.ENTITY_TYPE, new Identifier("renew_auto_plus", "amethyst_basic_projectile"), FabricEntityTypeBuilder.<AmethystBasicProjectileEntity>create(SpawnGroup.MISC, AmethystBasicProjectileEntity::new).dimensions(EntityDimensions.fixed(0.3125f, 0.3125f)).trackedUpdateRate(20).trackRangeChunks(4).forceTrackedVelocityUpdates(true).build());
 	public static final EntityType<AquamarineBasicProjectileEntity> AQUAMARINE_BASIC_PROJECTILE_ENTITY =  Registry.register(Registry.ENTITY_TYPE, new Identifier("renew_auto_plus", "aquamarine_basic_projectile"), FabricEntityTypeBuilder.<AquamarineBasicProjectileEntity>create(SpawnGroup.MISC, AquamarineBasicProjectileEntity::new).dimensions(EntityDimensions.fixed(0.3125f, 0.3125f)).trackedUpdateRate(20).trackRangeChunks(4).forceTrackedVelocityUpdates(true).build());
 	public static final EntityType<AquamarineSpecialProjectileEntity> AQUAMARINE_SPECIAL_PROJECTILE_ENTITY =  Registry.register(Registry.ENTITY_TYPE, new Identifier("renew_auto_plus", "aquamarine_special_projectile"), FabricEntityTypeBuilder.<AquamarineSpecialProjectileEntity>create(SpawnGroup.MISC, AquamarineSpecialProjectileEntity::new).dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackedUpdateRate(20).trackRangeChunks(4).forceTrackedVelocityUpdates(true).build());
 	public static final EntityType<RubyBasicProjectileEntity> RUBY_BASIC_PROJECTILE_ENTITY =  Registry.register(Registry.ENTITY_TYPE, new Identifier("renew_auto_plus", "ruby_basic_projectile"), FabricEntityTypeBuilder.<RubyBasicProjectileEntity>create(SpawnGroup.MISC, RubyBasicProjectileEntity::new).dimensions(EntityDimensions.changing(0.5f, 0.5f)).trackedUpdateRate(20).trackRangeChunks(4).forceTrackedVelocityUpdates(true).build());
+	public static final EntityType<OnyxBasicProjectileEntity> ONYX_BASIC_PROJECTILE_ENTITY =  Registry.register(Registry.ENTITY_TYPE, new Identifier("renew_auto_plus", "onyx_basic_projectile"), FabricEntityTypeBuilder.<OnyxBasicProjectileEntity>create(SpawnGroup.MISC, OnyxBasicProjectileEntity::new).dimensions(EntityDimensions.changing(0.5f, 0.5f)).trackedUpdateRate(20).trackRangeChunks(4).forceTrackedVelocityUpdates(true).build());
 
 	public static final EntityType<BanishedEntity> BANISHED_ENTITY = Registry.register(Registry.ENTITY_TYPE, new Identifier("renew_auto_plus", "banished_entity"), FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, BanishedEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.95f)).build());
 	public static final Item BANISHED_SPAWN_EGG = new SpawnEggItem(BANISHED_ENTITY, 0xdfe0d9, 0x111111, new FabricItemSettings().group(ItemGroup.MISC));
+	public static final EntityType<GhostBanishedEntity> GHOST_BANISHED_ENTITY = Registry.register(Registry.ENTITY_TYPE, new Identifier("renew_auto_plus", "ghost_banished_entity"), FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, GhostBanishedEntity::new).dimensions(EntityDimensions.fixed(0.6f, 1.95f)).build());
+	public static final Item GHOST_BANISHED_SPAWN_EGG = new SpawnEggItem(GHOST_BANISHED_ENTITY, 0xf05dec, 0x111111, new FabricItemSettings().group(ItemGroup.MISC));
+	public static final EntityType<FallenEntity> FALLEN_ENTITY = Registry.register(Registry.ENTITY_TYPE, new Identifier("renew_auto_plus", "fallen_entity"), FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, FallenEntity::new).dimensions(EntityDimensions.fixed(0.6f, 2.65f)).build());
+	public static final Item FALLEN_SPAWN_EGG = new SpawnEggItem(FALLEN_ENTITY, 0x59ea63, 0xc87194, new FabricItemSettings().group(ItemGroup.MISC));
 
 	public static final PaintingMotive HEY_THERE = Registry.register(Registry.PAINTING_MOTIVE, new Identifier("renew_auto_plus", "hey_there"), new PaintingMotive(64, 64));
 
@@ -177,6 +195,8 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 	public static final Identifier CRATE_STRING_PACKET_ID = new Identifier("renew_auto_plus", "crate_string_packet");
 	public static final Identifier REPLACED_ON_ATTACK_PACKET_ID = new Identifier("renew_auto_plus", "replaced_on_attack");
 	public static final Identifier REPLACED_STOP_ATTACK_PACKET_ID = new Identifier("renew_auto_plus", "replaced_stop_attack");
+
+	public static final Identifier RUBY_WAND_SPECIAL_EFFECT = new Identifier("renew_auto_plus", "textures/entity/ruby_special_effect.png");
 
 	public static final Identifier THE_WASTES = new Identifier("renew_auto_plus", "the_wastes");
 	public static final RegistryKey<World> THE_WASTES_REGISTRY_KEY = RegistryKey.of(Registry.WORLD_KEY, THE_WASTES);
@@ -199,6 +219,8 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "amethyst_wand"), AMETHYST_WAND);
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "aquamarine_wand"), AQUAMARINE_WAND);
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "ruby_wand"), RUBY_WAND);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "topaz_wand"), TOPAZ_WAND);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "onyx_wand"), ONYX_WAND);
 
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "banished_helmet"), BANISHED_HELMET);
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "banished_chestplate"), BANISHED_CHESTPLATE);
@@ -234,6 +256,15 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "white_sandstone"), new BlockItem(WHITE_SANDSTONE, new Item.Settings().group(ItemGroup.BUILDING_BLOCKS)));
 		Registry.register(Registry.BLOCK, new Identifier("renew_auto_plus", "wastes_ruin"), WASTES_RUIN);
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "wastes_ruin"), new BlockItem(WASTES_RUIN, new Item.Settings().group(ItemGroup.BUILDING_BLOCKS)));
+		Registry.register(Registry.BLOCK, new Identifier("renew_auto_plus", "wastes_portal_frame"), WASTES_PORTAL_FRAME);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "wastes_portal_frame"), new BlockItem(WASTES_PORTAL_FRAME, new Item.Settings().group(ItemGroup.DECORATIONS)));
+		Registry.register(Registry.BLOCK, new Identifier("renew_auto_plus", "wastes_portal_controller"), WASTES_PORTAL_CONTROLLER);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "wastes_portal_controller"), new BlockItem(WASTES_PORTAL_CONTROLLER, new Item.Settings().group(ItemGroup.DECORATIONS)));
+		Registry.register(Registry.BLOCK, new Identifier("renew_auto_plus", "ruined_wastes_portal_frame"), RUINED_WASTES_PORTAL_FRAME);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "ruined_wastes_portal_frame"), new BlockItem(RUINED_WASTES_PORTAL_FRAME, new Item.Settings().group(ItemGroup.DECORATIONS)));
+		Registry.register(Registry.BLOCK, new Identifier("renew_auto_plus", "ruined_wastes_portal_controller"), RUINED_WASTES_PORTAL_CONTROLLER);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "ruined_wastes_portal_controller"), new BlockItem(RUINED_WASTES_PORTAL_CONTROLLER, new Item.Settings().group(ItemGroup.DECORATIONS)));
+		Registry.register(Registry.BLOCK, new Identifier("renew_auto_plus", "wastes_portal_surface"), WASTES_PORTAL_SURFACE);
 		Registry.register(Registry.BLOCK, new Identifier("renew_auto_plus", "terracotta_coal_ore"), TERRACOTTA_COAL_ORE);
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "terracotta_coal_ore"), new BlockItem(TERRACOTTA_COAL_ORE, new Item.Settings().group(ItemGroup.DECORATIONS)));
 		Registry.register(Registry.BLOCK, new Identifier("renew_auto_plus", "terracotta_iron_ore"), TERRACOTTA_IRON_ORE);
@@ -249,6 +280,10 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 
 		FabricDefaultAttributeRegistry.register(BANISHED_ENTITY, BanishedEntity.createMobAttributes());
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "banished_spawn_egg"), BANISHED_SPAWN_EGG);
+		FabricDefaultAttributeRegistry.register(GHOST_BANISHED_ENTITY, GhostBanishedEntity.createMobAttributes());
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "ghost_banished_spawn_egg"), GHOST_BANISHED_SPAWN_EGG);
+		FabricDefaultAttributeRegistry.register(FALLEN_ENTITY, FallenEntity.createMobAttributes());
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "fallen_spawn_egg"), FALLEN_SPAWN_EGG);
 
 		Registry.register(Registry.SOUND_EVENT, new Identifier("renew_auto_plus", "extractor_on"), EXTRACTOR_ON_SE);
 

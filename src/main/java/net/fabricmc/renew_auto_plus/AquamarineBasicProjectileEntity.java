@@ -31,6 +31,9 @@ public class AquamarineBasicProjectileEntity extends AbstractMagicProjectileEnti
         Entity owner = this.getOwner();
         entity.timeUntilRegen = 0;
         entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 1.4f);
+        if(owner instanceof LivingEntity) {
+            ((LivingEntity)owner).onAttacking(entity);
+        }
         this.discard();
         this.setOwner(null);
     }

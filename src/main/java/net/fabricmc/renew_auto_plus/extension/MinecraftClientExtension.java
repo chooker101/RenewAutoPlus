@@ -50,7 +50,7 @@ public abstract class MinecraftClientExtension extends ReentrantThreadExecutor<R
     public abstract ClientPlayNetworkHandler getNetworkHandler();
 
     @Shadow
-    public abstract void doAttack();
+    private void doAttack() {}
 
     @Inject(method = "handleBlockBreaking(Z)V", at = @At("HEAD"), cancellable = true)
     private void handleBlockBreakingEarlyReturn(boolean bl, CallbackInfo info) {

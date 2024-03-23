@@ -33,6 +33,9 @@ public class AmethystBasicProjectileEntity extends AbstractMagicProjectileEntity
         Entity entity = entityHitResult.getEntity();
         Entity owner = this.getOwner();
         entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 5.0f);
+        if(owner instanceof LivingEntity) {
+            ((LivingEntity)owner).onAttacking(entity);
+        }
         this.discard();
         this.setOwner(null);
     }

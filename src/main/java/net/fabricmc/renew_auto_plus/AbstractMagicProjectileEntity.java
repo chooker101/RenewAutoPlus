@@ -1,11 +1,11 @@
 package net.fabricmc.renew_auto_plus;
 
 import net.fabricmc.renew_auto_plus.helper.PublicProjectileEntity;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.Packet;
@@ -81,11 +81,10 @@ public class AbstractMagicProjectileEntity extends PublicProjectileEntity {
             this.spawnTrailParticles(this.getX(), this.getY(), this.getZ());
             return;
         }
-        if ((hitResult = ProjectileUtil.getCollision(this, this::canHit)).getType() != HitResult.Type.MISS) {
+        if ((hitResult = PublicProjectileEntity.getCollision(this, this::canHit)).getType() != HitResult.Type.MISS) {
             this.onCollision(hitResult);
             this.velocityDirty = true;
         }
-        RenewAutoPlusInitialize.LOGGER.info("leftOwner: {}", this.leftOwner);
         this.checkBlockCollision();
         Vec3d vec3d = this.getVelocity();
         double d = this.getX() + vec3d.x;
@@ -100,10 +99,22 @@ public class AbstractMagicProjectileEntity extends PublicProjectileEntity {
         }
         this.setVelocityIfMoving(vec3d.add(this.powerX, this.powerY, this.powerZ).multiply(g));
         this.setPosition(d, e, f);
+        //Yucky, need some sort of lerp or something
+        if(this.useDoubleCollision()) {
+            if (hitResult.getType() == HitResult.Type.MISS){
+                if ((hitResult = PublicProjectileEntity.getCollision(this, this::canHit)).getType() != HitResult.Type.MISS) {
+                    this.onCollision(hitResult);
+                    this.velocityDirty = true;
+                }
+            }
+        }
         this.spawnTrailParticles(d, e, f);
         this.age();
     }
 
+    protected void parentTick() {
+        super.tick();
+    }
 
     protected void setVelocityIfMoving(Vec3d velocity) {
         if(!hasHitBlock) {
@@ -195,6 +206,10 @@ public class AbstractMagicProjectileEntity extends PublicProjectileEntity {
     @Override
     public float getBrightnessAtEyes() {
         return 1.0f;
+    }
+
+    protected boolean useDoubleCollision() {
+        return false;
     }
 
     @Override

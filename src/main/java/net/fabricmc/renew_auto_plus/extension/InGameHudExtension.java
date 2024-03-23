@@ -32,7 +32,6 @@ public abstract class InGameHudExtension extends DrawableHelper {
     private void renderOverlay(Identifier texture, float opacity) {}
 
     @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;F)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getFrozenTicks()I"))
-    //@Inject(method = "Lnet/minecraft/client/gui/hud/InGameHud;render(Lnet/minecraft/client/util/math/MatrixStack;F)V", at = @At("HEAD"))
     protected void renderExtension(MatrixStack matrices, float tickDelta, CallbackInfo info) {
         if(this.client.player.getDataTracker().get(RenewAutoPlusInitialize.IS_ICEBOUND)) {
             this.renderOverlay(POWDER_SNOW_OUTLINE, 1.0f);

@@ -9,8 +9,8 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.util.Identifier;
 
-public class BanishedEntityRender extends BipedEntityRenderer<BanishedEntity, BanishedEntityModel>{
-    protected BanishedEntityRender(EntityRendererFactory.Context ctx) {
+public class BanishedEntityRenderer extends BipedEntityRenderer<BanishedEntity, BanishedEntityModel>{
+    protected BanishedEntityRenderer(EntityRendererFactory.Context ctx) {
         super(ctx, new BanishedEntityModel(ctx.getPart(EntityModelLayers.PLAYER_SLIM)), 0.5f);
         this.addFeature(new BanishedArmorFeatureRenderer<BanishedEntity, BanishedEntityModel, BanishedEntityModel>(this, new BanishedEntityModel(ctx.getPart(EntityModelLayers.PLAYER_SLIM_INNER_ARMOR)), new BanishedEntityModel(ctx.getPart(EntityModelLayers.PLAYER_SLIM_OUTER_ARMOR))));
     }

@@ -38,6 +38,7 @@ public class ClockBlockEntityRender<T extends BlockEntity> implements BlockEntit
     private double time;
     private double step;
     private long lastTick;
+    private int lastClockFace = -1;
 
     ClockBlockEntityRender(BlockEntityRendererFactory.Context ctx) {
         frontIdentifier = new Identifier("renew_auto_plus:textures/block/clock_block_front.png");
@@ -129,7 +130,10 @@ public class ClockBlockEntityRender<T extends BlockEntity> implements BlockEntit
         }
         float clockTime = UdateClockTime((ClientWorld)blockEntity.getWorld());
         int clockFaceFromTime = (int)(clockTime * 64.0f);
-        UpdateFaceTexture(clockFaceFromTime);
+        if(clockFaceFromTime != lastClockFace) {
+            UpdateFaceTexture(clockFaceFromTime);
+            lastClockFace = clockFaceFromTime;
+        }
 
         matrices.push();
         //Scale and draw front face

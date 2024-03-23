@@ -1,0 +1,50 @@
+{
+  "variants": {
+    "facing=east,powered=false": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame",
+      "y": 90
+    },
+    "facing=north,powered=false": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame"
+    },
+    "facing=south,powered=false": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame",
+      "y": 180
+    },
+    "facing=west,powered=false": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame",
+      "y": 270
+    },
+    "facing=up,powered=false": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame",
+      "x": 270
+    },
+    "facing=down,powered=false": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame",
+      "x": 90
+    },
+    "facing=east,powered=true": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame_lit",
+      "y": 90
+    },
+    "facing=north,powered=true": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame_lit"
+    },
+    "facing=south,powered=true": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame_lit",
+      "y": 180
+    },
+    "facing=west,powered=true": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame_lit",
+      "y": 270
+    },
+    "facing=up,powered=true": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame_lit",
+      "x": 270
+    },
+    "facing=down,powered=true": {
+      "model": "renew_auto_plus:block/ruined_wastes_portal_frame_lit",
+      "x": 90
+    }
+  }
+}
