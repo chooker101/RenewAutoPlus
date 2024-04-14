@@ -29,7 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
-    private static final Identifier TEXTURE = new Identifier("textures/gui/container/creative_inventory/tabs.png");
+    private static final Identifier BASE_TAB_TEXTURE = new Identifier("renew_auto_plus", "textures/gui/container/abacus/tab_icons.png");
     private static final String TAB_TEXTURE_PREFIX = "textures/gui/container/abacus/";
     private static final int COMPANY_SETTINGS = 0;
     private static final int CRATE_SETTINGS = 1;
@@ -41,6 +41,8 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
     private static final int settingsDeleteY = 141;
     private static final int tradeConfirmX = 151;
     private static final int tradeConfirmY = 131;
+    private static final int autoTradeConfirmX = 151;
+    private static final int autoTradeConfirmY = 15;
     private int selectedTab = 0;
     private int selectedSettingsPage = 0;
     private int selectedTradeIndex;
@@ -160,6 +162,8 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
                         return super.mouseClicked(mouseX, mouseY, button);
                     }
 
+                    boolean autoTradeState = loadedStallTrade.isAutoTradeEnabled(); //For rendering
+
                     int tradeAmount = 1;
                     try{
                         tradeAmount = Integer.parseInt(tradeAmountBox.getText());
@@ -172,14 +176,15 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
                         if (!isLoadedTradeActive()) {
                             return super.mouseClicked(mouseX, mouseY, button);
                         }
-                        if(!handler.canBuyWith(loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange(), tradeAmount) || marketItemOwned < tradeAmount) {
-                            int maxCanBuy = handler.getMaxCanBuy(loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange());
+                        if(!handler.canBuyWith(loadedStallTrade.getBuyEmeraldAmount(), loadedStallTrade.getBuyEmeraldChange(), tradeAmount) || marketItemOwned < tradeAmount) {
+                            int maxCanBuy = handler.getMaxCanBuy(loadedStallTrade.getBuyEmeraldAmount(), loadedStallTrade.getBuyEmeraldChange());
                             tradeAmount = maxCanBuy > marketItemOwned ? marketItemOwned : maxCanBuy;
                         }
                         loadedStallTrade.setMarketItemAmount(loadedStallTrade.getMarketItemAmount() - tradeAmount);
                         loadedStallTrade.setActive(loadedStallTrade.getMarketItemAmount() > 0);
                         loadedStallTrade.setCompanyItemAmount(loadedStallTrade.getCompanyItemAmount() + tradeAmount);
                         loadedStallTrade.setSellable(loadedStallTrade.getCompanyItemAmount() > 0);
+                        loadedStallTrade.setAutoTradeEnabled(false); //This is not an autoTrade
                     }
                     else {
                         if (!loadedStallTrade.isSellable()) {
@@ -193,9 +198,42 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
                         loadedStallTrade.setSellable(loadedStallTrade.getCompanyItemAmount() > 0);
                         loadedStallTrade.setMarketItemAmount(loadedStallTrade.getMarketItemAmount() + tradeAmount);
                         loadedStallTrade.setActive(loadedStallTrade.getMarketItemAmount() > 0);
+                        loadedStallTrade.setAutoTradeEnabled(false); //This is not an autoTrade
                     }
                     PacketByteBuf byteBuf = new PacketByteBuf(Unpooled.buffer());
                     TransactStallTradeC2SPacket packet = new TransactStallTradeC2SPacket(handler.getBlockPos(), currentScreenTab == AbacusScreenTab.BUY, loadedStallTrade, tradeAmount);
+                    packet.write(byteBuf);
+                    this.client.getNetworkHandler().sendPacket(ClientPlayNetworking.createC2SPacket(RenewAutoPlusInitialize.ABACUS_TRANSACT_PACKET_ID, byteBuf));
+                    this.client.interactionManager.clickButton(((AbacusScreenHandler)this.handler).syncId, 1);
+                    loadedStallTrade.setAutoTradeEnabled(autoTradeState);
+                    return true;
+                }
+                u = (int)mouseX - (this.x + autoTradeConfirmX);
+                v = (int)mouseY - (this.y + autoTradeConfirmY);
+                if(u >= 0 && v >= 0 && u < 18 && v < 18) {
+                    if(loadedStallTrade == null) {
+                        return super.mouseClicked(mouseX, mouseY, button);
+                    }
+
+                    int tradeAmount = 1;
+                    try{
+                        tradeAmount = Integer.parseInt(tradeAmountBox.getText());
+                    }
+                    catch(Exception exception) {
+                        tradeAmount = 1;
+                    }
+                    StallTrade autoTrade = new StallTrade(loadedStallTrade.getTradedItem(), loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange(), loadedStallTrade.getAmountBeforeCommon());
+                    loadedStallTrade.setAutoTradeEnabled(true); //For rendering
+                    autoTrade.setAutoTradeEnabled(true);
+                    autoTrade.setStockState(loadedStallTrade.getStockState()); //Change to button setting
+                    //if(currentScreenTab == AbacusScreenTab.BUY) {
+                    //    autoTrade.setActive(true);
+                    //}
+                    //else {
+                    //    autoTrade.setActive(false);
+                    //}
+                    PacketByteBuf byteBuf = new PacketByteBuf(Unpooled.buffer());
+                    TransactStallTradeC2SPacket packet = new TransactStallTradeC2SPacket(handler.getBlockPos(), currentScreenTab == AbacusScreenTab.BUY, autoTrade, tradeAmount);
                     packet.write(byteBuf);
                     this.client.getNetworkHandler().sendPacket(ClientPlayNetworking.createC2SPacket(RenewAutoPlusInitialize.ABACUS_TRANSACT_PACKET_ID, byteBuf));
                     this.client.interactionManager.clickButton(((AbacusScreenHandler)this.handler).syncId, 1);
@@ -226,7 +264,7 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
         AbacusScreenTab selectedScreenTab = AbacusScreenTab.TABS[selectedTab];
         for (AbacusScreenTab tab : AbacusScreenTab.TABS) {
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderTexture(0, TEXTURE);
+            RenderSystem.setShaderTexture(0, BASE_TAB_TEXTURE);
             if (tab.getIndex() == selectedTab) continue;
             this.renderTabIcon(matrices, tab);
         }
@@ -305,7 +343,7 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
             if(u >= 0 && v >= 0 && u < 18 && v < 18) {
                 if(loadedStallTrade != null) {
                     if(AbacusScreenTab.TABS[selectedTab] == AbacusScreenTab.BUY) {
-                        if (!handler.canBuyWith(loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange()) || !isLoadedTradeActive()) {
+                        if (!handler.canBuyWith(loadedStallTrade.getBuyEmeraldAmount(), loadedStallTrade.getBuyEmeraldChange()) || !isLoadedTradeActive()) {
                             this.drawTexture(matrices, this.x + tradeConfirmX, this.y + tradeConfirmY, 61, 166, 18, 18);
                         } else {
                             this.drawTexture(matrices, this.x + tradeConfirmX, this.y + tradeConfirmY, 79, 166, 18, 18);
@@ -326,6 +364,29 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
             else {
                 this.drawTexture(matrices, this.x + tradeConfirmX, this.y + tradeConfirmY, 61, 166, 18, 18);
             }
+            u = mouseX - (this.x + autoTradeConfirmX);
+            v = mouseY - (this.y + autoTradeConfirmY);
+            if(u >= 0 && v >= 0 && u < 18 && v < 18) {
+                if(loadedStallTrade != null) {
+                    this.drawTexture(matrices, this.x + autoTradeConfirmX, this.y + autoTradeConfirmY, 79, 184, 18, 18);
+                }
+                else {
+                    this.drawTexture(matrices, this.x + autoTradeConfirmX, this.y + autoTradeConfirmY, 61, 184, 18, 18);
+                }
+            }
+            else {
+                if(loadedStallTrade != null) {
+                    if (loadedStallTrade.isAutoTradeEnabled()) {
+                        this.drawTexture(matrices, this.x + autoTradeConfirmX, this.y + autoTradeConfirmY, 97, 184, 18, 18);
+                    }
+                    else {
+                        this.drawTexture(matrices, this.x + autoTradeConfirmX, this.y + autoTradeConfirmY, 61, 184, 18, 18);
+                    }
+                }
+                else {
+                    this.drawTexture(matrices, this.x + autoTradeConfirmX, this.y + autoTradeConfirmY, 61, 184, 18, 18);
+                }
+            }
             renderStallTrades(matrices, selectedScreenTab, mouseX, mouseY);
             renderLoadedTrade(matrices, selectedScreenTab);
             this.tradeAmountBox.render(matrices, mouseX, mouseY, delta);
@@ -333,7 +394,7 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
         }
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, TEXTURE);
+        RenderSystem.setShaderTexture(0, BASE_TAB_TEXTURE);
         this.renderTabIcon(matrices, selectedScreenTab);
     }
  
@@ -461,12 +522,25 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
             l += i;
         }
         this.drawTexture(matrices, l, m, j, k, 28, 32);
-        //this.itemRenderer.zOffset = 100.0f;
-        //int n2 = 1;
-        //ItemStack itemStack = tab.getIcon();
-        //this.itemRenderer.renderInGuiWithOverrides(itemStack, l += 6, m += 8 + n2);
-        //this.itemRenderer.renderGuiItemOverlay(this.textRenderer, itemStack, l, m);
-        //this.itemRenderer.zOffset = 0.0f;
+        this.itemRenderer.zOffset = 100.0f;
+        int n2 = 1;
+        ItemStack itemStack = tab.getIcon();
+        this.itemRenderer.renderInGuiWithOverrides(itemStack, l += 6, m += 8 + n2);
+        this.itemRenderer.renderGuiItemOverlay(this.textRenderer, itemStack, l, m);
+        this.itemRenderer.zOffset = 0.0f;
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, BASE_TAB_TEXTURE);
+        if(tab == AbacusScreenTab.BUY) {
+            AbacusScreen.drawTexture(matrices, l + 9, m + 8, this.getZOffset() + 300, 10.0f, 64.0f, 10, 10, 256, 256);
+        }
+        else if(tab == AbacusScreenTab.SELL) {
+            AbacusScreen.drawTexture(matrices, l + 9, m + 8, this.getZOffset() + 300, 0.0f, 64.0f, 10, 10, 256, 256);
+        }
+        else if(tab == AbacusScreenTab.SETTINGS) {
+            AbacusScreen.drawTexture(matrices, l + 10, m + 9, this.getZOffset() + 300, 20.0f, 64.0f, 7, 7, 256, 256);
+        }
+        
     }
 
     protected int getPageIconRenderHeight(int i) {
@@ -698,12 +772,14 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
                 else {
                     this.itemRenderer.renderInGui(itemStack, l, n);
                     this.itemRenderer.renderGuiItemOverlay(this.textRenderer, itemStack, l, n);
+                    renderStock(matrices, stallTrade, l, n);
                 }
                 //Render arrow
                 renderArrow(matrices, stallTrade, i, n);
                 if(tab == AbacusScreenTab.BUY) {
                     this.itemRenderer.renderInGui(itemStack, l + 40, n);
                     this.itemRenderer.renderGuiItemOverlay(this.textRenderer, itemStack, l + 40, n);
+                    renderStock(matrices, stallTrade, l + 40, n);
                 }
                 else
                 {
@@ -722,12 +798,40 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
         }
     }
 
+    private void renderStock(MatrixStack matrices, StallTrade tradeOffer, int x, int y){
+        RenderSystem.enableBlend();
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, new Identifier("renew_auto_plus", TAB_TEXTURE_PREFIX + AbacusScreenTab.TABS[selectedTab].getBackgroundTexture()));
+        if(AbacusScreenTab.TABS[selectedTab] == AbacusScreenTab.BUY) {
+            if(tradeOffer.getStockState() == StallTrade.StockState.LOW) {
+                AbacusScreen.drawTexture(matrices, x + 7, y + 6, this.getZOffset() + 300, 135.0f, 166.0f, 10, 10, 256, 256);
+            }
+            else if(tradeOffer.getStockState() == StallTrade.StockState.HIGH) {
+                AbacusScreen.drawTexture(matrices, x + 7, y + 6, this.getZOffset() + 300, 115.0f, 166.0f, 10, 10, 256, 256);
+            }
+            else {
+                AbacusScreen.drawTexture(matrices, x + 7, y + 6, this.getZOffset() + 300, 125.0f, 166.0f, 10, 10, 256, 256);
+            }
+        }
+        else if (AbacusScreenTab.TABS[selectedTab] == AbacusScreenTab.SELL) {
+            if(tradeOffer.getStockState() == StallTrade.StockState.LOW) {
+                AbacusScreen.drawTexture(matrices, x + 7, y + 6, this.getZOffset() + 300, 115.0f, 166.0f, 10, 10, 256, 256);
+            }
+            else if(tradeOffer.getStockState() == StallTrade.StockState.HIGH) {
+                AbacusScreen.drawTexture(matrices, x + 7, y + 6, this.getZOffset() + 300, 135.0f, 166.0f, 10, 10, 256, 256);
+            }
+            else {
+                AbacusScreen.drawTexture(matrices, x + 7, y + 6, this.getZOffset() + 300, 125.0f, 166.0f, 10, 10, 256, 256);
+            }
+        }
+    }
+
     private void renderArrow(MatrixStack matrices, StallTrade tradeOffer, int x, int y) {
         RenderSystem.enableBlend();
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderTexture(0, new Identifier("renew_auto_plus", TAB_TEXTURE_PREFIX + AbacusScreenTab.TABS[selectedTab].getBackgroundTexture()));
         if(AbacusScreenTab.TABS[selectedTab] == AbacusScreenTab.BUY) {
-            if (!handler.canBuyWith(tradeOffer.getEmeraldAmount(), tradeOffer.getEmeraldChange())) {
+            if (!handler.canBuyWith(tradeOffer.getBuyEmeraldAmount(), tradeOffer.getBuyEmeraldChange())) {
                 AbacusScreen.drawTexture(matrices, x + 33, y + 3, this.getZOffset() + 1, 22.0f, 226.0f, 10, 9, 256, 256);
             } else {
                 AbacusScreen.drawTexture(matrices, x + 33, y + 3, this.getZOffset() + 1, 12.0f, 226.0f, 10, 9, 256, 256);
@@ -742,7 +846,7 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
         }
         else if(AbacusScreenTab.TABS[selectedTab] == AbacusScreenTab.SETTINGS) {
             if(tradeOffer.isActive()) {
-                if (!handler.canBuyWith(tradeOffer.getEmeraldAmount(), tradeOffer.getEmeraldChange())) {
+                if (!handler.canBuyWith(tradeOffer.getBuyEmeraldAmount(), tradeOffer.getBuyEmeraldChange())) {
                     AbacusScreen.drawTexture(matrices, x + 33, y + 3, this.getZOffset() + 1, 22.0f, 226.0f, 10, 9, 256, 256);
                 } else {
                     AbacusScreen.drawTexture(matrices, x + 33, y + 3, this.getZOffset() + 1, 12.0f, 226.0f, 10, 9, 256, 256);
@@ -786,17 +890,17 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
         ItemStack emeraldStack = Items.EMERALD.getDefaultStack();
         this.itemRenderer.zOffset = 100.0f;
         if(tab == AbacusScreenTab.BUY) {
-            if(!handler.canBuyWith(loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange(), tradeAmount) || tradeAmount > marketItemOwned) {
-                int maxCanBuy = handler.getMaxCanBuy(loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange());
+            if(!handler.canBuyWith(loadedStallTrade.getBuyEmeraldAmount(), loadedStallTrade.getBuyEmeraldChange(), tradeAmount) || tradeAmount > marketItemOwned) {
+                int maxCanBuy = handler.getMaxCanBuy(loadedStallTrade.getBuyEmeraldAmount(), loadedStallTrade.getBuyEmeraldChange());
                 tradeAmount = maxCanBuy > marketItemOwned ? marketItemOwned : maxCanBuy;
             }
-            String emeraldString = handler.getEmeraldString(loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange(), tradeAmount);
+            String emeraldString = handler.getEmeraldString(loadedStallTrade.getBuyEmeraldAmount(), loadedStallTrade.getBuyEmeraldChange(), tradeAmount);
             this.itemRenderer.renderInGui(emeraldStack, l, k);
             this.itemRenderer.renderGuiItemOverlay(this.textRenderer, emeraldStack, l, k);
             this.itemRenderer.renderInGui(itemStack, l + 48, k);
             this.itemRenderer.renderGuiItemOverlay(this.textRenderer, itemStack, l + 40, k);
             //top
-            m = (handler.getEmeraldFromChangeAmount(loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange(), tradeAmount) >= 100 ? 85 : (handler.getEmeraldFromChangeAmount(loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange(), tradeAmount) >= 10 ? 88 : 91));
+            m = (handler.getEmeraldFromChangeAmount(loadedStallTrade.getBuyEmeraldAmount(), loadedStallTrade.getBuyEmeraldChange(), tradeAmount) >= 100 ? 85 : (handler.getEmeraldFromChangeAmount(loadedStallTrade.getBuyEmeraldAmount(), loadedStallTrade.getBuyEmeraldChange(), tradeAmount) >= 10 ? 88 : 91));
             n = (tradeAmount >= 100 ? 141 : (tradeAmount >= 10 ? 144 : 147)); // Garbage and raplace with aligning code, Text.width
             this.textRenderer.draw(matrices, emeraldString, i + m, j + 68, 0x404040);
             this.textRenderer.draw(matrices, Integer.toString(tradeAmount), i + n, j + 68, 0x404040);
@@ -812,13 +916,13 @@ public class AbacusScreen extends HandledScreen<AbacusScreenHandler> {
             if(tradeAmount > companyItemOwned) {
                 tradeAmount = companyItemOwned;
             }
-            String emeraldString = handler.getEmeraldString(loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange(), tradeAmount);
+            String emeraldString = handler.getEmeraldString(loadedStallTrade.getSellEmeraldAmount(), loadedStallTrade.getSellEmeraldChange(), tradeAmount);
             this.itemRenderer.renderInGui(itemStack, l, k);
             this.itemRenderer.renderGuiItemOverlay(this.textRenderer, itemStack, l, k);
             this.itemRenderer.renderInGui(emeraldStack, l + 48, k);
             this.itemRenderer.renderGuiItemOverlay(this.textRenderer, emeraldStack, l + 40, k);
             //top
-            m = (handler.getEmeraldFromChangeAmount(loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange(), tradeAmount) >= 100 ? 134 : (handler.getEmeraldFromChangeAmount(loadedStallTrade.getEmeraldAmount(), loadedStallTrade.getEmeraldChange(), tradeAmount) >= 10 ? 137 : 140));
+            m = (handler.getEmeraldFromChangeAmount(loadedStallTrade.getSellEmeraldAmount(), loadedStallTrade.getSellEmeraldChange(), tradeAmount) >= 100 ? 134 : (handler.getEmeraldFromChangeAmount(loadedStallTrade.getSellEmeraldAmount(), loadedStallTrade.getSellEmeraldChange(), tradeAmount) >= 10 ? 137 : 140));
             n = (tradeAmount >= 100 ? 92 : (tradeAmount >= 10 ? 95 : 98));
             this.textRenderer.draw(matrices, emeraldString, i + m, j + 68, 0x404040);
             this.textRenderer.draw(matrices, Integer.toString(tradeAmount), i + n, j + 68, 0x404040);

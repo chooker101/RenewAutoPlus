@@ -14,6 +14,7 @@ import net.minecraft.util.Util;
 import net.minecraft.village.VillagerProfession;
 
 public class StallTrades {
+    //Generic trades, always available, NO DUPLICATES ALLOWED
     public static final ItemValueFactory[] STALL_TRADES = new ItemValueFactory[]{
         new ItemValueFactory(Items.WHEAT, 0, 10, 1000), 
         new ItemValueFactory(Items.POTATO, 0, 8, 1000), 
@@ -24,6 +25,7 @@ public class StallTrades {
         new ItemValueFactory(Items.COBBLESTONE, 0, 8, 1000)
     };
 
+    //Duplicates allowed
     public static final HashMap<VillagerProfession, ItemValueFactory[]> VILLAGER_TRADES = Util.make(Maps.newHashMap(), map -> {
         map.put(VillagerProfession.FARMER, 
         new ItemValueFactory[]{
@@ -35,7 +37,8 @@ public class StallTrades {
         });
         map.put(VillagerProfession.SHEPHERD, 
         new ItemValueFactory[]{
-            new ItemValueFactory(Blocks.WHITE_WOOL, 0, 10, 1000)
+            new ItemValueFactory(Blocks.WHITE_WOOL, 0, 10, 1000),
+            new ItemValueFactory(Items.STRING, 0, 10, 1000)
         });
         map.put(VillagerProfession.FLETCHER, 
         new ItemValueFactory[]{

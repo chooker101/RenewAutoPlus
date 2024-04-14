@@ -194,12 +194,22 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
         return this.stallTradeList;
     }
 
+    private boolean containsTradeItemAlready(StallTrade tradeOffer) {
+        for(StallTrade existingTrade : stallTradeList) {
+            if(tradeOffer.getTradedItem().isItemEqual(existingTrade.getTradedItem())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void fillTradeListFromPool() {
         if(villageProfessions != null && !villageProfessions.isEmpty()) {
             for (VillagerProfession profession : villageProfessions) {
                 for (StallTrades.ItemValueFactory factory : StallTrades.VILLAGER_TRADES.get(profession)) {
                     StallTrade tradeOffer = factory.create();
                     if (tradeOffer == null) continue;
+                    if (containsTradeItemAlready(tradeOffer)) continue;
                     int ownedAmount = getItemsForTrade(tradeOffer);
                     tradeOffer.setActive(ownedAmount > 0);
                     tradeOffer.setMarketItemAmount(ownedAmount);
@@ -210,6 +220,7 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
         for (StallTrades.ItemValueFactory factory : StallTrades.STALL_TRADES) {
             StallTrade tradeOffer = factory.create();
             if (tradeOffer == null) continue;
+            //No check for duplicates
             int ownedAmount = getItemsForTrade(tradeOffer);
             tradeOffer.setActive(ownedAmount > 0);
             tradeOffer.setMarketItemAmount(ownedAmount);

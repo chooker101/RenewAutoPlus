@@ -271,17 +271,17 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
         }
         else
         {
-            if(isPurchase) {
+            if(isPurchase) { //Might need to factor in going over stock states
                 addItemToStackOrEmpty(stallTrade.getTradedItem(), tradeAmount);
                 attachedMarket.removeItemOrMaterialsFromInventory(stallTrade.getTradedItem().getItem(), tradeAmount);
-                decreaseRealEmeralds((stallTrade.getEmeraldAmount() * tradeAmount) + ((100 - this.emeraldChange) + stallTrade.getEmeraldChange() * tradeAmount) / 100);
-                decreaseEmeraldChange(stallTrade.getEmeraldChange() * tradeAmount);
+                decreaseRealEmeralds((stallTrade.getBuyEmeraldAmount() * tradeAmount) + ((100 - this.emeraldChange) + stallTrade.getBuyEmeraldChange() * tradeAmount) / 100);
+                decreaseEmeraldChange(stallTrade.getBuyEmeraldChange() * tradeAmount);
             }
             else {
                 removeItemInStackOrEmpty(stallTrade.getTradedItem(), tradeAmount);
                 attachedMarket.addItemToInventory(stallTrade.getTradedItem().getItem(), tradeAmount);
-                increaseRealEmeralds((stallTrade.getEmeraldAmount() * tradeAmount) + (this.emeraldChange + stallTrade.getEmeraldChange() * tradeAmount) / 100);
-                increaseEmeraldChange(stallTrade.getEmeraldChange() * tradeAmount);
+                increaseRealEmeralds((stallTrade.getSellEmeraldAmount() * tradeAmount) + (this.emeraldChange + stallTrade.getSellEmeraldChange() * tradeAmount) / 100);
+                increaseEmeraldChange(stallTrade.getSellEmeraldChange() * tradeAmount);
             }
         }
         return;
@@ -636,26 +636,26 @@ public class AbacusBlockEntity extends LockableContainerBlockEntity implements E
         AutoStallTrade trade = autoTradeList.get(index);
         getRealEmeraldAmount();
         if(trade.isPurchase) {
-            if(attachedMarket.getItemsForTrade(trade, trade.tradeAmount) > 0 && canBuyWithAmount(trade.getEmeraldAmount(), trade.getEmeraldChange(), trade.tradeAmount, this.emeraldAmount, this.emeraldChange)) {
+            if(attachedMarket.getItemsForTrade(trade, trade.tradeAmount) > 0 && canBuyWithAmount(trade.getBuyEmeraldAmount(), trade.getBuyEmeraldChange(), trade.tradeAmount, this.emeraldAmount, this.emeraldChange)) {
                 addItemToStackOrEmpty(trade.getTradedItem(), trade.tradeAmount);
                 attachedMarket.removeItemOrMaterialsFromInventory(trade.getTradedItem().getItem(), trade.tradeAmount);
-                decreaseRealEmeralds((trade.getEmeraldAmount() * trade.tradeAmount) + (trade.getEmeraldChange() * trade.tradeAmount) / 100);
-                decreaseEmeraldChange(trade.getEmeraldChange() * trade.tradeAmount);
+                decreaseRealEmeralds((trade.getBuyEmeraldAmount() * trade.tradeAmount) + (trade.getBuyEmeraldChange() * trade.tradeAmount) / 100);
+                decreaseEmeraldChange(trade.getBuyEmeraldChange() * trade.tradeAmount);
             }
         }
         else {
             if(checkIfHaveToSell(trade) >= trade.tradeAmount) {
                 removeItemInStackOrEmpty(trade.getTradedItem(), trade.tradeAmount);
                 attachedMarket.addItemToInventory(trade.getTradedItem().getItem(), trade.tradeAmount);
-                increaseRealEmeralds((trade.getEmeraldAmount() * trade.tradeAmount) + (trade.getEmeraldChange() * trade.tradeAmount) / 100);
-                increaseEmeraldChange(trade.getEmeraldChange() * trade.tradeAmount);
+                increaseRealEmeralds((trade.getSellEmeraldAmount() * trade.tradeAmount) + (trade.getSellEmeraldChange() * trade.tradeAmount) / 100);
+                increaseEmeraldChange(trade.getSellEmeraldChange() * trade.tradeAmount);
             }
         }
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, AbacusBlockEntity blockEntity) {
-        blockEntity.tryTransactAutoTrade(blockEntity.getAutoTradeIndex());
-        blockEntity.iterateAutoTradeIndex();
+        //blockEntity.tryTransactAutoTrade(blockEntity.getAutoTradeIndex());
+        //blockEntity.iterateAutoTradeIndex();
         return;
     }
 

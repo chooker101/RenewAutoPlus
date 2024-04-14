@@ -81,13 +81,22 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 	public static final TopazWandItem TOPAZ_WAND = new TopazWandItem(new Item.Settings().group(ItemGroup.COMBAT).maxDamage(750));
 	public static final OnyxWandItem ONYX_WAND = new OnyxWandItem(new Item.Settings().group(ItemGroup.COMBAT).maxDamage(750));
 
-	public static final Item BANISHED_HELMET = new ArmorItem(BanishedArmorMaterial.INSTANCE, EquipmentSlot.HEAD, new Item.Settings());
-	public static final Item BANISHED_CHESTPLATE = new ArmorItem(BanishedArmorMaterial.INSTANCE, EquipmentSlot.CHEST, new Item.Settings());
-	public static final Item BANISHED_LEGGINGS = new ArmorItem(BanishedArmorMaterial.INSTANCE, EquipmentSlot.LEGS, new Item.Settings());
-	public static final Item BANISHED_BOOTS = new ArmorItem(BanishedArmorMaterial.INSTANCE, EquipmentSlot.FEET, new Item.Settings());
+	public static final Item BANISHED_HELMET = new ArmorItem(BanishedArmorMaterial.INSTANCE, EquipmentSlot.HEAD, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item BANISHED_CHESTPLATE = new ArmorItem(BanishedArmorMaterial.INSTANCE, EquipmentSlot.CHEST, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item BANISHED_LEGGINGS = new ArmorItem(BanishedArmorMaterial.INSTANCE, EquipmentSlot.LEGS, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item BANISHED_BOOTS = new ArmorItem(BanishedArmorMaterial.INSTANCE, EquipmentSlot.FEET, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item COPPER_HELMET = new ArmorItem(CopperArmorMaterial.INSTANCE, EquipmentSlot.HEAD, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item COPPER_CHESTPLATE = new ArmorItem(CopperArmorMaterial.INSTANCE, EquipmentSlot.CHEST, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item COPPER_LEGGINGS = new ArmorItem(CopperArmorMaterial.INSTANCE, EquipmentSlot.LEGS, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item COPPER_BOOTS = new ArmorItem(CopperArmorMaterial.INSTANCE, EquipmentSlot.FEET, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item LINEN_HOOD = new ArmorItem(LinenArmorMaterial.INSTANCE, EquipmentSlot.HEAD, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item LINEN_ROBE = new ArmorItem(LinenArmorMaterial.INSTANCE, EquipmentSlot.CHEST, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item LINEN_LEGGINGS = new ArmorItem(LinenArmorMaterial.INSTANCE, EquipmentSlot.LEGS, new Item.Settings().group(ItemGroup.COMBAT));
+	public static final Item LINEN_BOOTS = new ArmorItem(LinenArmorMaterial.INSTANCE, EquipmentSlot.FEET, new Item.Settings().group(ItemGroup.COMBAT));
 
 	public static final Item RAW_DIAMOND = new Item(new FabricItemSettings().group(ItemGroup.MISC));
 	public static final Item SPICE = new Item(new FabricItemSettings().group(ItemGroup.MISC));
+	public static final Item LINEN = new Item(new FabricItemSettings().group(ItemGroup.MISC));
 
 	public static final StatusEffect BIG_DICK = Registry.register(Registry.STATUS_EFFECT, "big_dick", new PublicStatusEffect(StatusEffectCategory.BENEFICIAL, 0x44FF44));
 	public static final StatusEffect SHADOWED = Registry.register(Registry.STATUS_EFFECT, "shadowed", new PublicStatusEffect(StatusEffectCategory.BENEFICIAL, 8356754));
@@ -120,6 +129,7 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 	public static final StatusEffect CHARGED = Registry.register(Registry.STATUS_EFFECT, "charged", new PublicStatusEffect(StatusEffectCategory.BENEFICIAL, 0xF58442));
 	
 	public static final FoodComponent LETTUCE_FOOD_COMPONENT = new FoodComponent.Builder().hunger(4).saturationModifier(0.3f).statusEffect(new StatusEffectInstance(BIG_DICK, 200, 0), 0.3f).build();
+	public static final FoodComponent MAYONNAISE_FOOD_COMPONENT = new FoodComponent.Builder().hunger(4).saturationModifier(0.3f).build();
 
 	public static final Potion SHADOW_POTION = Registry.register(Registry.POTION, new Identifier("renew_auto_plus", "shadow_potion"), new Potion(new StatusEffectInstance(SHADOWED, 3600, 0)));
 	public static final Potion ICEBOUND_POTION = Registry.register(Registry.POTION, new Identifier("renew_auto_plus", "icebound_potion"), new Potion(new StatusEffectInstance(ICEBOUND, 3600, 0)));
@@ -150,6 +160,7 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 	public static final Block TERRACOTTA_COPPER_ORE = new OreBlock(FabricBlockSettings.of(Material.STONE, MapColor.TERRACOTTA_RED).requiresTool().strength(2.0f, 3.0f));
 
 	public static final Item LETTUCE = new AliasedBlockItem(LETTUCE_BLOCK, new Item.Settings().group(ItemGroup.FOOD).food(LETTUCE_FOOD_COMPONENT));
+	public static final Item MAYONNAISE = new MayonnaiseItem(new Item.Settings().group(ItemGroup.FOOD).food(MAYONNAISE_FOOD_COMPONENT).maxCount(1));
 
 	public static final ScreenHandlerType<ExtractorScreenHandler> EXTRACTOR_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier("renew_auto_plus", "extractor"), ExtractorScreenHandler::new);
 	public static final ScreenHandlerType<ClockBlockScreenHandler> CLOCK_BLOCK_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier("renew_auto_plus", "clock_block"), ClockBlockScreenHandler::new);
@@ -226,9 +237,19 @@ public class RenewAutoPlusInitialize implements ModInitializer {
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "banished_chestplate"), BANISHED_CHESTPLATE);
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "banished_leggings"), BANISHED_LEGGINGS);
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "banished_boots"), BANISHED_BOOTS);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "copper_helmet"), COPPER_HELMET);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "copper_chestplate"), COPPER_CHESTPLATE);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "copper_leggings"), COPPER_LEGGINGS);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "copper_boots"), COPPER_BOOTS);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "linen_hood"), LINEN_HOOD);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "linen_robe"), LINEN_ROBE);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "linen_leggings"), LINEN_LEGGINGS);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "linen_boots"), LINEN_BOOTS);
 
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "raw_diamond"), RAW_DIAMOND);
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "spice"), SPICE);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "linen"), LINEN);
+		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "mayonnaise"), MAYONNAISE);
 
 		Registry.register(Registry.BLOCK, new Identifier("renew_auto_plus", "smelter"), SMELTER);
 		Registry.register(Registry.ITEM, new Identifier("renew_auto_plus", "smelter"), new BlockItem(SMELTER, new Item.Settings().group(ItemGroup.DECORATIONS)));

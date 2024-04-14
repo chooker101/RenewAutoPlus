@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "renew_auto_plus:item/copper_leggings"
+  }
+}

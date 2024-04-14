@@ -2,7 +2,6 @@ package net.fabricmc.renew_auto_plus;
 
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -34,7 +33,7 @@ public class BanishedArmorMaterial implements ArmorMaterial{
  
 	@Override
 	public Ingredient getRepairIngredient() {
-		return Ingredient.ofItems(Items.IRON_BARS); //Change to spice?
+		return Ingredient.ofItems(RenewAutoPlusInitialize.SPICE);
 	}
  
 	@Override
