@@ -12,9 +12,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import net.minecraft.util.math.RotationAxis;
 
 @Environment(value=EnvType.CLIENT)
 public class RubyBasicProjectileEntityRender extends EntityRenderer<RubyBasicProjectileEntity> {
@@ -34,9 +34,9 @@ public class RubyBasicProjectileEntityRender extends EntityRenderer<RubyBasicPro
     public void render(RubyBasicProjectileEntity magicEntity, float yaw, float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         matrixStack.push();
         matrixStack.translate(0.0, 0.15, 0.0);
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(MathHelper.lerp(tickDelta, magicEntity.prevYaw, magicEntity.getYaw()) - 90.0f));
-        matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(MathHelper.lerp(tickDelta, magicEntity.prevPitch, magicEntity.getPitch())));
-        matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(45.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.lerp(tickDelta, magicEntity.prevYaw, magicEntity.getYaw()) - 90.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.lerp(tickDelta, magicEntity.prevPitch, magicEntity.getPitch())));
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(45.0f));
         matrixStack.scale(0.05625f, 0.05625f, 0.05625f);
         VertexConsumer t = vertexConsumerProvider.getBuffer(LAYER);
         MatrixStack.Entry entry = matrixStack.peek();
@@ -54,7 +54,7 @@ public class RubyBasicProjectileEntityRender extends EntityRenderer<RubyBasicPro
             this.vertex(matrix4f, matrix3f, t, 8, -7, 7, 0.34375f, 0.8958f, 1, 0, 0, i);
             this.vertex(matrix4f, matrix3f, t, 8, -7, -7, 0.0f, 0.8958f, 1, 0, 0, i);
             for (int u = 0; u < 2; ++u) {
-                matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
+                matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0f));
                 this.vertex(matrix4f, matrix3f, t, -15, -7, 0, 0.0f, 0.6666f, 0, 1, 0, i);
                 this.vertex(matrix4f, matrix3f, t, 15, -7, 0, 0.6875f, 0.6666f, 0, 1, 0, i);
                 this.vertex(matrix4f, matrix3f, t, 15, 7, 0, 0.6875f, 0.78125f, 0, 1, 0, i);
@@ -72,7 +72,7 @@ public class RubyBasicProjectileEntityRender extends EntityRenderer<RubyBasicPro
             this.vertex(matrix4f, matrix3f, t, 5, -5, 5, 0.21875f, 0.4792f, 1, 0, 0, i);
             this.vertex(matrix4f, matrix3f, t, 5, -5, -5, 0.0f, 0.4792f, 1, 0, 0, i);
             for (int u = 0; u < 2; ++u) {
-                matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
+                matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0f));
                 this.vertex(matrix4f, matrix3f, t, -10, -5, 0, 0.0f, 0.3333f, 0, 1, 0, i);
                 this.vertex(matrix4f, matrix3f, t, 10, -5, 0, 0.5f, 0.3333f, 0, 1, 0, i);
                 this.vertex(matrix4f, matrix3f, t, 10, 5, 0, 0.5f, 0.40625f, 0, 1, 0, i);
@@ -90,7 +90,7 @@ public class RubyBasicProjectileEntityRender extends EntityRenderer<RubyBasicPro
             this.vertex(matrix4f, matrix3f, t, 3, -2, 2, 0.15625f, 0.1042f, 1, 0, 0, i);
             this.vertex(matrix4f, matrix3f, t, 3, -2, -2, 0.0f, 0.1042f, 1, 0, 0, i);
             for (int u = 0; u < 2; ++u) {
-                matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
+                matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0f));
                 this.vertex(matrix4f, matrix3f, t, -6, -2, 0, 0.0f, 0.0f, 0, 1, 0, i);
                 this.vertex(matrix4f, matrix3f, t, 6, -2, 0, 0.5f, 0.0f, 0, 1, 0, i);
                 this.vertex(matrix4f, matrix3f, t, 6, 2, 0, 0.5f, 0.05208f, 0, 1, 0, i);

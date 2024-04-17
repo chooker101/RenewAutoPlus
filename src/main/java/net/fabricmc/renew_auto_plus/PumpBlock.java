@@ -1,5 +1,7 @@
 package net.fabricmc.renew_auto_plus;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -31,6 +33,7 @@ import net.minecraft.world.World;
 @SuppressWarnings("unchecked")
 
 public class PumpBlock extends BlockWithEntity {
+    public static final MapCodec<PumpBlock> CODEC = PumpBlock.createCodec(PumpBlock::new);
 	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final IntProperty LEVEL = Properties.LEVEL_8;
     public static final BooleanProperty LIQUID_TYPE = Properties.CONDITIONAL;
@@ -40,6 +43,11 @@ public class PumpBlock extends BlockWithEntity {
 		super(settings);
 		setDefaultState(this.stateManager.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH).with(Properties.LEVEL_8, 0).with(Properties.CONDITIONAL, true).with(Properties.POWERED, false));
 	}
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
@@ -72,7 +80,7 @@ public class PumpBlock extends BlockWithEntity {
 
     @Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerFacing());
+		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerLookDirection());
 	}
 
 	@Override

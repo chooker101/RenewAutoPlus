@@ -2,35 +2,10 @@
     "type": "renew_auto_plus:the_wastes",
     "generator": {
       "type": "minecraft:noise",
-      "seed": -1138639231,
       "settings": "renew_auto_plus:the_wastes",
       "biome_source": {
         "type": "minecraft:fixed",
-        "biome": "renew_auto_plus:the_wastes",
-        "parameters": {
-            "temperature": [
-              0.55,
-              1
-            ],
-            "humidity": [
-              -0.35,
-              -0.1
-            ],
-            "continentalness": [
-              0.3,
-              1
-            ],
-            "erosion": [
-              -0.375,
-              -0.2225
-            ],
-            "weirdness": [
-              0.9333,
-              1
-            ],
-            "depth": 0,
-            "offset": 0
-          }
+        "biome": "renew_auto_plus:the_wastes"
       }
     }
 }

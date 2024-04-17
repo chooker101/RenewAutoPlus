@@ -14,7 +14,7 @@ public class TransactStallTradePlayChannelHandler implements PlayChannelHandler 
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         TransactStallTradeC2SPacket packet = new TransactStallTradeC2SPacket(buf);
         try{
-            NetworkThreadUtils.forceMainThread(packet, handler, player.getWorld());
+            NetworkThreadUtils.forceMainThread(packet, handler, player.getServerWorld());
         }
         catch(Exception e) {
             return;
@@ -22,9 +22,9 @@ public class TransactStallTradePlayChannelHandler implements PlayChannelHandler 
     }
 
     public static void onTransactStallTrade(ServerPlayerEntity player, ServerPlayNetworkHandler handler, TransactStallTradeC2SPacket packet) {
-        if(player.world != null) {
+        if(player.getWorld() != null) {
             AbacusBlockEntity abacusBlockEntity = null;
-            BlockEntity blockEntity = player.world.getBlockEntity(packet.getBlockPos());
+            BlockEntity blockEntity = player.getWorld().getBlockEntity(packet.getBlockPos());
             if (blockEntity instanceof AbacusBlockEntity) {
                 abacusBlockEntity = (AbacusBlockEntity)blockEntity;
             }

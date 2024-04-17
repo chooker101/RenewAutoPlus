@@ -1,5 +1,7 @@
 package net.fabricmc.renew_auto_plus;
 
+import com.mojang.serialization.MapCodec;
+
 import net.fabricmc.renew_auto_plus.helper.OverworldInventoryStorage;
 
 import net.minecraft.block.AbstractBlock;
@@ -17,18 +19,20 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.BlockRotation;
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
 
 //NEED TO MAKE A RUINED VERSION, CAN'T REASONABLY DETECT
 public class WastesPortalSurfaceBlock extends BlockWithEntity {
+    public static final MapCodec<WastesPortalSurfaceBlock> CODEC = WastesPortalSurfaceBlock.createCodec(WastesPortalSurfaceBlock::new);
     public static final EnumProperty<Direction.Axis> AXIS = Properties.HORIZONTAL_AXIS;
     public static final IntProperty X_BLOCK_POS = IntProperty.of("x_block_pos", 0, 2);
     public static final IntProperty Y_BLOCK_POS = IntProperty.of("y_block_pos", 0, 2);
@@ -38,6 +42,11 @@ public class WastesPortalSurfaceBlock extends BlockWithEntity {
     protected WastesPortalSurfaceBlock(AbstractBlock.Settings settings) {
         super(settings);
         setDefaultState(this.stateManager.getDefaultState().with(Properties.HORIZONTAL_AXIS, Direction.Axis.X).with(X_BLOCK_POS, 0).with(Y_BLOCK_POS, 0));
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
     }
 
     @Override
@@ -69,7 +78,7 @@ public class WastesPortalSurfaceBlock extends BlockWithEntity {
     }
 
     @Override
-    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         return ItemStack.EMPTY;
     }
 

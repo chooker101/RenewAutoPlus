@@ -61,7 +61,6 @@ public class BanishedEntity extends HostileEntity{
         this.targetSelector.add(2, playerTargetGoal);
     }
 
-    @Override
     protected void initEquipment(LocalDifficulty difficulty) {
         this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(RenewAutoPlusInitialize.BANISHED_SWORD));
         this.equipStack(EquipmentSlot.HEAD, new ItemStack(RenewAutoPlusInitialize.BANISHED_HELMET));

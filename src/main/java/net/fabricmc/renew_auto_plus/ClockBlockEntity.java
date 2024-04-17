@@ -12,7 +12,6 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -134,7 +133,7 @@ public class ClockBlockEntity extends BlockEntity implements NamedScreenHandlerF
 
     @Override
     public Text getDisplayName() {
-        return new TranslatableText(getCachedState().getBlock().getTranslationKey());
+        return Text.translatable(getCachedState().getBlock().getTranslationKey());
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, ClockBlockEntity blockEntity) {
@@ -172,7 +171,7 @@ public class ClockBlockEntity extends BlockEntity implements NamedScreenHandlerF
         if(blockEntity.currentTime.isZero() && !blockEntity.setTime.isZero() && !blockEntity.timerDone) {
             state = (BlockState)state.with(ClockBlock.POWERED, true);
             world.setBlockState(pos, state, Block.NOTIFY_ALL);
-            world.createAndScheduleBlockTick(pos, state.getBlock(), 2);
+            world.scheduleBlockTick(pos, state.getBlock(), 2);
             if(blockEntity.toggleMode == 0) {
                 blockEntity.currentTime.setTo(blockEntity.setTime);
             }

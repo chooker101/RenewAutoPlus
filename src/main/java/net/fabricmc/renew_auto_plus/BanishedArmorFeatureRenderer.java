@@ -52,7 +52,8 @@ extends FeatureRenderer<T, M> {
         if (armorItem.getSlotType() != armorSlot) {
             return;
         }
-        ((BipedEntityModel<T>)this.getContextModel()).setAttributes(model);
+        //((BipedEntityModel<T>)this.getContextModel()).setAttributes(model);
+        ((BipedEntityModel<T>)this.getContextModel()).copyBipedStateTo(model);
         this.setVisible(armorSlot, model);
         boolean bl = this.usesSecondLayer(armorSlot);
         boolean bl2 = itemStack.hasGlint();

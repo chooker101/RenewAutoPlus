@@ -7,7 +7,7 @@ import com.google.common.collect.Multimap;
 
 import net.fabricmc.renew_auto_plus.helper.AttackActionReplacedWithCharge;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.damage.ProjectileDamageSource;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -19,6 +19,7 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.RangedWeaponItem;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -71,7 +72,7 @@ public class TopazWandItem extends RangedWeaponItem implements AttackActionRepla
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-        boolean bl = user.getArrowType(itemStack).getCount() >= 2;
+        boolean bl = user.getProjectileType(itemStack).getCount() >= 2;
         user.getItemCooldownManager().set(this, 300);
         if (user.getAbilities().creativeMode || bl) {
             user.setCurrentHand(hand);
@@ -101,7 +102,7 @@ public class TopazWandItem extends RangedWeaponItem implements AttackActionRepla
         if(mUser.equals(entity)) {
             return false;
         }
-        if (entity.isSpectator() || !entity.isAlive() || !entity.collides()) {
+        if (!entity.canBeHitByProjectile()) {
             return false;
         }
         return !mUser.isConnectedThroughVehicle(entity) && !entity.noClip;
@@ -120,7 +121,7 @@ public class TopazWandItem extends RangedWeaponItem implements AttackActionRepla
         }
         if (!user.getAbilities().creativeMode) {
             if(topazWand.currentProcTicks == 0) {
-                user.getArrowType(wand).decrement(1);
+                user.getProjectileType(wand).decrement(1);
             }
         }
         Vec3d endPoint = user.getRotationVector().normalize().multiply((float)topazWand.maxSegments).add(user.getEyePos());
@@ -148,10 +149,10 @@ public class TopazWandItem extends RangedWeaponItem implements AttackActionRepla
                         }
                         else {
                             if(user.hasStatusEffect(RenewAutoPlusInitialize.CHARGED)) {
-                                livingEntity.damage(new ProjectileDamageSource("directMagic", user, user).setProjectile(), 5.0f);
+                                livingEntity.damage(new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(RenewAutoPlusInitialize.DIRECT_MAGIC), user, user), 5.0f);
                             }
                             else {
-                                livingEntity.damage(new ProjectileDamageSource("directMagic", user, user).setProjectile(), 4.0f);
+                                livingEntity.damage(new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(RenewAutoPlusInitialize.DIRECT_MAGIC), user, user), 4.0f);
                             }
                             user.onAttacking(livingEntity);
                         }
@@ -176,7 +177,7 @@ public class TopazWandItem extends RangedWeaponItem implements AttackActionRepla
         user.heal(10.0f);
         wand.damage(1, user, e -> e.sendToolBreakStatus(hand));
         if (!user.getAbilities().creativeMode) {
-            user.getArrowType(wand).decrement(2);
+            user.getProjectileType(wand).decrement(2);
         }
         //world.playSoundFromEntity(null, user, SoundEvents.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 1.0f, 1.0f);
     }
@@ -201,7 +202,7 @@ public class TopazWandItem extends RangedWeaponItem implements AttackActionRepla
     public void onAttackServer(World world, PlayerEntity user, Hand hand) {
         if(currentAttackTicks > 2 && !onCooldown) {
             ItemStack itemStack = user.getStackInHand(hand);
-            boolean bl = !user.getArrowType(itemStack).isEmpty();
+            boolean bl = !user.getProjectileType(itemStack).isEmpty();
             if (user.getAbilities().creativeMode || bl) {
                 user.setCurrentHand(hand);
                 TopazWandItem.shootBasicAttack(world, user, hand, itemStack, TopazWandItem.getSpeed(), TopazWandItem.getDivergence());

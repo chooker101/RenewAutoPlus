@@ -9,7 +9,6 @@ import net.minecraft.item.RangedWeaponItem;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 
 public class AmethystWandItem extends RangedWeaponItem {
@@ -35,7 +34,7 @@ public class AmethystWandItem extends RangedWeaponItem {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-        boolean bl = !user.getArrowType(itemStack).isEmpty();
+        boolean bl = !user.getProjectileType(itemStack).isEmpty();
         user.getItemCooldownManager().set(this, 10);
         if (user.getAbilities().creativeMode || bl) {
             user.setCurrentHand(hand);
@@ -58,13 +57,13 @@ public class AmethystWandItem extends RangedWeaponItem {
             return;
         }
         Vec3d vec3d = user.getRotationVec(1.0f);
-        Vec3f vec3f = new Vec3f(vec3d);
-        AmethystBasicProjectileEntity projectileEntity = new AmethystBasicProjectileEntity(world, user, vec3f.getX(), vec3f.getY(), vec3f.getZ());
-        projectileEntity.setVelocity(vec3f.getX(), vec3f.getY(), vec3f.getZ(), speed, divergence);
-        projectileEntity.setPosition(user.getX() + vec3f.getX(), (user.getEyeY() - 0.15) + vec3f.getY(), user.getZ() + vec3f.getZ());
+        //Vec3f vec3f = new Vec3f(vec3d);
+        AmethystBasicProjectileEntity projectileEntity = new AmethystBasicProjectileEntity(world, user, vec3d.getX(), vec3d.getY(), vec3d.getZ());
+        projectileEntity.setVelocity(vec3d.getX(), vec3d.getY(), vec3d.getZ(), speed, divergence);
+        projectileEntity.setPosition(user.getX() + vec3d.getX(), (user.getEyeY() - 0.15) + vec3d.getY(), user.getZ() + vec3d.getZ());
         wand.damage(1, user, e -> e.sendToolBreakStatus(hand));
         if (!user.getAbilities().creativeMode) {
-            user.getArrowType(wand).decrement(1);
+            user.getProjectileType(wand).decrement(1);
         }
         world.spawnEntity(projectileEntity);
         //world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1.0f, soundPitch);

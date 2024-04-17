@@ -1,6 +1,5 @@
 package net.fabricmc.renew_auto_plus;
 
-import java.util.Random;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.AbstractFurnaceBlock;
 import net.minecraft.block.Block;
@@ -15,25 +14,35 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.text.TranslatableTextContent;
+
+import com.mojang.serialization.MapCodec;
 @SuppressWarnings("unchecked")
 
 public class SmelterBlock
 extends AbstractFurnaceBlock {
+    public static final MapCodec<SmelterBlock> CODEC = SmelterBlock.createCodec(SmelterBlock::new);
+
     protected SmelterBlock(AbstractBlock.Settings settings) {
         super(settings);
     }
 
     @Override
+    protected MapCodec<? extends AbstractFurnaceBlock> getCodec() {
+        return CODEC;
+    }
+
+    @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new FurnaceBlockEntityReplacement(pos, state, 38599, new TranslatableText("container.smelter")); //Not synced to client, so useless
+        return new FurnaceBlockEntityReplacement(pos, state, 38599, new TranslatableTextContent("container.smelter", "Smelter", null)); //Not synced to client, so useless
     }
 
     private static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> returnAFuckingDumbAssTicker(BlockEntityTicker<? super E> ticker) {

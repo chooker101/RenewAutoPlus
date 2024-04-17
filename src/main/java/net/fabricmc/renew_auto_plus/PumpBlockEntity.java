@@ -18,7 +18,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -164,7 +163,7 @@ public class PumpBlockEntity extends LockableContainerBlockEntity implements Sid
     @Override
     public void setStack(int slot, ItemStack stack) {
         ItemStack itemStack = this.inventory.get(slot);
-        boolean bl = !stack.isEmpty() && stack.isItemEqualIgnoreDamage(itemStack) && ItemStack.areNbtEqual(stack, itemStack);
+        boolean bl = !stack.isEmpty() && ItemStack.canCombine(stack, itemStack);
         this.inventory.set(slot, stack);
         if (stack.getCount() > this.getMaxCountPerStack()) {
             stack.setCount(this.getMaxCountPerStack());
@@ -242,7 +241,7 @@ public class PumpBlockEntity extends LockableContainerBlockEntity implements Sid
 
     @Override
     protected Text getContainerName() {
-        return new TranslatableText(getCachedState().getBlock().getTranslationKey());
+        return Text.translatable(getCachedState().getBlock().getTranslationKey());
     }
 
     @Override

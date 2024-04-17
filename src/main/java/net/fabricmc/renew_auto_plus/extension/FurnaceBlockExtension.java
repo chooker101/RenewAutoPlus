@@ -12,7 +12,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.world.World;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,7 +31,7 @@ public abstract class FurnaceBlockExtension extends AbstractFurnaceBlock {
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new FurnaceBlockEntityReplacement(pos, state, 4799, new TranslatableText("container.furnace"));
+        return new FurnaceBlockEntityReplacement(pos, state, 4799, new TranslatableTextContent("container.furnace", "Furnace", null));
     }
 
     @Override

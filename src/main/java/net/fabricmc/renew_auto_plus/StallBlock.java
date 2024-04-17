@@ -1,5 +1,7 @@
 package net.fabricmc.renew_auto_plus;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -20,11 +22,17 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class StallBlock extends BlockWithEntity {
+    public static final MapCodec<StallBlock> CODEC = StallBlock.createCodec(StallBlock::new);
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     protected StallBlock(Settings settings) {
         super(settings);
         setDefaultState(this.stateManager.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH));
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
     }
 
     @Override
@@ -44,7 +52,7 @@ public class StallBlock extends BlockWithEntity {
 
     @Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerFacing().getOpposite());
+		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerLookDirection().getOpposite());
 	}
 
 	@Override

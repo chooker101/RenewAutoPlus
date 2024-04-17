@@ -17,7 +17,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.chunk.ChunkGenerator;
+//import net.minecraft.world.gen.chunk.ChunkGenerator;
 
 @Pseudo
 @Mixin(Entity.class)
@@ -36,8 +36,8 @@ public abstract class EntityExtension {
     protected void getTeleportTarget(ServerWorld destination, CallbackInfoReturnable<TeleportTarget> info) {
         if (destination.getRegistryKey() == RenewAutoPlusInitialize.THE_WASTES_REGISTRY_KEY) {
             if(RenewAutoPlusInitialize.wastesSpawnPos == null) { 
-                ChunkGenerator chunkGenerator = destination.getChunkManager().getChunkGenerator();
-                ChunkPos chunkPos = new ChunkPos(chunkGenerator.getMultiNoiseSampler().findBestSpawnPosition());
+                //ChunkGenerator chunkGenerator = destination.getChunkManager().getChunkGenerator();
+                ChunkPos chunkPos = new ChunkPos(0,0);
                 int i = destination.getLogicalHeight();
                 if (i < destination.getBottomY()) {
                     BlockPos blockPos = chunkPos.getStartPos();

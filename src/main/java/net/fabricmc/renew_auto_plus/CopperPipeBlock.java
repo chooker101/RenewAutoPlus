@@ -29,7 +29,10 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.entity.ai.pathing.NavigationType;
 import org.jetbrains.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 public class CopperPipeBlock extends BlockWithEntity {
+    public static final MapCodec<CopperPipeBlock> CODEC = CopperPipeBlock.createCodec(CopperPipeBlock::new);
     public static final DirectionProperty FACING;
     public static final DirectionProperty CONNECTION;
     public static final BooleanProperty ENABLED;
@@ -38,6 +41,11 @@ public class CopperPipeBlock extends BlockWithEntity {
 		super(settings);
 		setDefaultState(((BlockState)((BlockState)this.stateManager.getDefaultState()).with(FACING, Direction.UP)).with(CONNECTION, Direction.DOWN).with(ENABLED, true));
 	}
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
 
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new CopperPipeBlockEntity(pos, state);
@@ -189,7 +197,7 @@ public class CopperPipeBlock extends BlockWithEntity {
 
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-       return world.isClient ? null : checkType(type, RenewAutoPlusInitialize.COPPER_PIPE_BLOCK_ENTITY, CopperPipeBlockEntity::serverTick);
+       return CopperPipeBlock.validateTicker(type, RenewAutoPlusInitialize.COPPER_PIPE_BLOCK_ENTITY, world.isClient ? CopperPipeBlockEntity::clientTick : CopperPipeBlockEntity::serverTick);
     }
 
     @Override

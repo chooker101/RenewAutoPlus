@@ -10,7 +10,6 @@ import net.minecraft.block.ChestBlock;
 import net.minecraft.block.InventoryProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
@@ -21,7 +20,6 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.screen.HopperScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -47,7 +45,7 @@ public class CopperPipeBlockEntity extends LootableContainerBlockEntity implemen
    public void readNbt(NbtCompound nbt) {
       super.readNbt(nbt);
       this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
-      if (!this.deserializeLootTable(nbt)) {
+      if (!this.writeLootTable(nbt)) {
          Inventories.readNbt(nbt, this.inventory);
       }
 
@@ -56,7 +54,7 @@ public class CopperPipeBlockEntity extends LootableContainerBlockEntity implemen
 
    public void writeNbt(NbtCompound nbt) {
       super.writeNbt(nbt);
-      if (!this.serializeLootTable(nbt)) {
+      if (!this.readLootTable(nbt)) {
          Inventories.writeNbt(nbt, this.inventory);
       }
 
@@ -68,12 +66,12 @@ public class CopperPipeBlockEntity extends LootableContainerBlockEntity implemen
    }
 
    public ItemStack removeStack(int slot, int amount) {
-      this.checkLootInteraction((PlayerEntity)null);
+      //this.checkLootInteraction((PlayerEntity)null);
       return Inventories.splitStack(this.getInvStackList(), slot, amount);
    }
 
    public void setStack(int slot, ItemStack stack) {
-      this.checkLootInteraction((PlayerEntity)null);
+      //this.checkLootInteraction((PlayerEntity)null);
       this.getInvStackList().set(slot, stack);
       if (stack.getCount() > this.getMaxCountPerStack()) {
          stack.setCount(this.getMaxCountPerStack());
@@ -82,7 +80,7 @@ public class CopperPipeBlockEntity extends LootableContainerBlockEntity implemen
    }
 
    protected Text getContainerName() {
-      return new TranslatableText(getCachedState().getBlock().getTranslationKey());
+      return Text.translatable(getCachedState().getBlock().getTranslationKey());
    }
 
    public static void serverTick(World world, BlockPos pos, BlockState state, CopperPipeBlockEntity blockEntity) {
@@ -94,7 +92,9 @@ public class CopperPipeBlockEntity extends LootableContainerBlockEntity implemen
             return extract((World)world, blockEntity);
          });
       }
+   }
 
+   public static void clientTick(World world, BlockPos pos, BlockState state, CopperPipeBlockEntity blockEntity) {
    }
 
    private static boolean insertAndExtract(World world, BlockPos pos, BlockState state, CopperPipeBlockEntity blockEntity, BooleanSupplier booleanSupplier) {
@@ -302,7 +302,7 @@ public class CopperPipeBlockEntity extends LootableContainerBlockEntity implemen
    @Nullable
    private static Inventory getInputInventory(World world, Hopper hopper) {
       Inventory inv = null;
-      BlockPos pos = new BlockPos(hopper.getHopperX(), hopper.getHopperY(), hopper.getHopperZ());
+      BlockPos pos = new BlockPos((int)hopper.getHopperX(), (int)hopper.getHopperY(), (int)hopper.getHopperZ());
       Direction facing = world.getBlockState(pos).get(CopperPipeBlock.FACING);
 
       if(facing == Direction.NORTH) {
@@ -335,7 +335,7 @@ public class CopperPipeBlockEntity extends LootableContainerBlockEntity implemen
    @Nullable
    private static Inventory getInventoryAt(World world, double x, double y, double z) {
       Inventory inventory = null;
-      BlockPos blockPos = new BlockPos(x, y, z);
+      BlockPos blockPos = new BlockPos((int)x, (int)y, (int)z);
       BlockState blockState = world.getBlockState(blockPos);
       Block block = blockState.getBlock();
       if (block instanceof InventoryProvider) {
@@ -368,7 +368,7 @@ public class CopperPipeBlockEntity extends LootableContainerBlockEntity implemen
       } else if (first.getCount() > first.getMaxCount()) {
          return false;
       } else {
-         return ItemStack.areNbtEqual(first, second);
+         return ItemStack.canCombine(first, second);
       }
    }
 
@@ -409,5 +409,10 @@ public class CopperPipeBlockEntity extends LootableContainerBlockEntity implemen
 
    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
       return new HopperScreenHandler(syncId, playerInventory, this);
+   }
+
+   @Override
+   protected DefaultedList<ItemStack> method_11282() {
+      return this.inventory;
    }
 }

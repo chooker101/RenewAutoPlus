@@ -19,9 +19,11 @@ import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix4f;
+import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
 
 public class WastesPortalSurfaceBlockEntityRenderer<T extends WastesPortalSurfaceBlockEntity>
 implements BlockEntityRenderer<T> {
@@ -50,9 +52,9 @@ implements BlockEntityRenderer<T> {
         resourceManager = MinecraftClient.getInstance().getResourceManager();
         for (int i = 0; i < 4; ++i) { 
             try {
-                layerResources[i] = resourceManager.getResource(layerIdentifiers[i]);
+                layerResources[i] = resourceManager.getResource(layerIdentifiers[i]).get();
             }
-            catch(IOException exception) {
+            catch(Exception exception) {
                 RenewAutoPlusInitialize.LOGGER.debug("Failed to load wastes portal asset!");
                 layerResources[i] = null;
             }
@@ -75,27 +77,27 @@ implements BlockEntityRenderer<T> {
     //Fast-ish and approximate
     public void rasterizePortal(T wastesPortalSurfaceBlockEntity, float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, int overlay) {
         BlockPos blockPos = wastesPortalSurfaceBlockEntity.getPos();
-        Vec3f cornerPos0 = new Vec3f(((float)blockPos.getX()) + 1.0f, ((float)blockPos.getY()) + 1.0f, blockPos.getZ()); //Need to check direction
-        Vec3f cornerPos1 = new Vec3f(((float)blockPos.getX()), ((float)blockPos.getY()) + 1.0f, blockPos.getZ());
-        Vec3f cornerPos2 = new Vec3f(((float)blockPos.getX()) + 1.0f, ((float)blockPos.getY()), blockPos.getZ());
-        Vec3f renderPos = new Vec3f(0.0f, 0.0f, 0.0f);
+        Vec3d cornerPos0 = new Vec3d(blockPos.getX() + 1.0, blockPos.getY() + 1.0, blockPos.getZ()); //Need to check direction
+        Vec3d cornerPos1 = new Vec3d(blockPos.getX(), blockPos.getY() + 1.0, blockPos.getZ());
+        Vec3d cornerPos2 = new Vec3d(blockPos.getX() + 1.0, (float)blockPos.getY(), blockPos.getZ());
+        Vec3d renderPos = new Vec3d(0.0f, 0.0f, 0.0f);
         //Need to check if x or z dir
         int textureUOffset = 16 * wastesPortalSurfaceBlockEntity.getXBlockPos(); //Texture width of single block
         int textureVOffset = 16 * wastesPortalSurfaceBlockEntity.getYBlockPos();
-        float xStride = (cornerPos1.getX() - cornerPos0.getX()) / renderTextureWidth;
-        float yStride = (cornerPos2.getY() - cornerPos0.getY()) / renderTextureHeight;
+        float xStride = (((float)cornerPos1.getX()) - ((float)cornerPos0.getX())) / renderTextureWidth;
+        float yStride = (((float)cornerPos2.getY()) - ((float)cornerPos0.getY())) / renderTextureHeight;
         float zOffset = 30.0f;
-        Vec3f cameraPos = new Vec3f(client.gameRenderer.getCamera().getPos());
+        Vec3d cameraPos = new Vec3d(client.gameRenderer.getCamera().getPos().x, client.gameRenderer.getCamera().getPos().y, client.gameRenderer.getCamera().getPos().z);
         NativeImageBackedTexture nativeImage = renderedTextures.get(wastesPortalSurfaceBlockEntity.getImageUUID());
 
         for(int y = 0; y < renderTextureHeight; y++) {   
             for(int x = 0; x < renderTextureWidth; x++) {
-                renderPos.set(cornerPos0.getX() + xStride * x, cornerPos0.getY() + yStride * y, blockPos.getZ());
+                renderPos = new Vec3d(cornerPos0.getX() + xStride * x, cornerPos0.getY() + yStride * y, (double)blockPos.getZ()); //This is fucked, lost Vec3f, Vec3d const need to find a better replacement
                 renderPos.subtract(cameraPos);
                 renderPos.normalize();
-                float yDot = (float)Math.acos((double)renderPos.dot(Vec3f.POSITIVE_Y));
+                float yDot = (float)Math.acos((double)renderPos.dotProduct(new Vec3d(0.0, 1.0, 0.0)));
                 float currentYAngle = (float)Math.tan(1.5708f + yDot);
-                float xDot = (float)Math.acos((double)renderPos.dot(Vec3f.NEGATIVE_X)); //Also needs direction check
+                float xDot = (float)Math.acos((double)renderPos.dotProduct(new Vec3d(0.0, 0.0, -1.0))); //Also needs direction check
                 float currentXAngle = (float)Math.tan(1.5708f + xDot);
                 for(int z = 0; z < 4; z++) {
                     float currentZDistance = zOffset * z;
@@ -103,7 +105,7 @@ implements BlockEntityRenderer<T> {
                     float perspectiveYPos = y + currentZDistance * currentYAngle;
                     int colour = getNearestColour(textureUOffset, textureVOffset, z, perspectiveXPos, perspectiveYPos);
                     //Check if mask above alpha values
-                    if(NativeImage.getAlpha(colour) != 0) {
+                    if(ColorHelper.Abgr.getAlpha(colour) != 0) {
                         nativeImage.getImage().setColor(x, y, colour);
                         break;
                     } else if (z >= 3) {
@@ -139,7 +141,7 @@ implements BlockEntityRenderer<T> {
         if(!wastesPortalSurfaceBlockEntity.getWorld().isClient()) {
             return;
         }
-        if(client.options.graphicsMode == GraphicsMode.FANCY) {
+        if(client.options.getGraphicsMode().getValue() == GraphicsMode.FANCY) {
             if(!wastesPortalSurfaceBlockEntity.hasImage()) { //This is shit
                 UUID uuid = wastesPortalSurfaceBlockEntity.getImageUUID();
                 renderedTextures.put(uuid, new NativeImageBackedTexture(renderTextureWidth, renderTextureHeight, true));
@@ -158,11 +160,11 @@ implements BlockEntityRenderer<T> {
             matrixStack.scale(0.0078125f, 0.0078125f, 0.0078125f);
             Direction.Axis axis = wastesPortalSurfaceBlockEntity.getAxis();
             if(axis == Direction.Axis.X) {
-                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90.0f));
+                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90.0f));
                 matrixStack.translate(-128.0, 0.0, -128.0);
             }
             if(axis == Direction.Axis.Z) {
-                matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
+                matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
                 matrixStack.translate(-128.0, 0.0, -128.0);
             }
             Matrix4f matrix4f = matrixStack.peek().getPositionMatrix();

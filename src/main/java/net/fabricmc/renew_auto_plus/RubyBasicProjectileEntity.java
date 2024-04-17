@@ -4,12 +4,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.ProjectileDamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -31,7 +31,7 @@ public class RubyBasicProjectileEntity extends AbstractMagicProjectileEntity {
 
     public RubyBasicProjectileEntity(World world, LivingEntity owner, double velocityX, double velocityY, double velocityZ) {
         super(RenewAutoPlusInitialize.RUBY_BASIC_PROJECTILE_ENTITY, owner, velocityX, velocityY, velocityZ, world);
-        this.life = this.random.nextInt(0, 50);
+        this.life = this.random.nextBetween(0, 50);
     }
 
     @Override
@@ -72,7 +72,8 @@ public class RubyBasicProjectileEntity extends AbstractMagicProjectileEntity {
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
-        if (this.world.isClient) {
+        World world = this.getWorld();
+        if (world.isClient) {
             return;
         }
         Entity entity = entityHitResult.getEntity();
@@ -80,13 +81,13 @@ public class RubyBasicProjectileEntity extends AbstractMagicProjectileEntity {
         Size currentSize = this.getCurrentSize();
         switch (currentSize) {
             case SMALL:
-                entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 2.0f);
+                entity.damage(new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(RenewAutoPlusInitialize.DIRECT_MAGIC), this, owner), 2.0f);
                 break;
             case MEDIUM:
-                entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 7.0f);
+                entity.damage(new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(RenewAutoPlusInitialize.DIRECT_MAGIC), this, owner), 7.0f);
                 break;
             case LARGE:
-                entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 9.0f);
+                entity.damage(new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(RenewAutoPlusInitialize.DIRECT_MAGIC), this, owner), 9.0f);
                 break;
             default:
                 break;
@@ -103,10 +104,11 @@ public class RubyBasicProjectileEntity extends AbstractMagicProjectileEntity {
         this.setOwner(null);
     }
 
+    @SuppressWarnings("resource")
     @Override
     protected void onCollision(HitResult hitResult) {
         super.onCollision(hitResult);
-        if (!this.world.isClient) {
+        if (!this.getWorld().isClient) {
             if (hitResult.getType() == HitResult.Type.ENTITY && this.isOwner(((EntityHitResult)hitResult).getEntity())) {
                 return;
             }
@@ -125,14 +127,15 @@ public class RubyBasicProjectileEntity extends AbstractMagicProjectileEntity {
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        if (!this.world.isClient) {
+        World world = this.getWorld();
+        if (!world.isClient) {
             if(hasHitBlock) {
                 this.discard();
                 this.setOwner(null);
             }
         }
         super.onBlockHit(blockHitResult);
-        if(this.world.isClient){
+        if(world.isClient){
             world.addBlockBreakParticles(blockHitResult.getBlockPos(), world.getBlockState(blockHitResult.getBlockPos()));
         }
     }

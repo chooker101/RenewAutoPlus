@@ -187,7 +187,7 @@ public class FallenEntity extends HostileEntity {
         private boolean willCollide(Vec3d direction, int steps) {
             Box box = this.fallen.getBoundingBox();
             for (int i = 1; i < steps; ++i) {
-                if (this.fallen.world.isSpaceEmpty(this.fallen, box = box.offset(direction))) continue;
+                if (this.fallen.getWorld().isSpaceEmpty(this.fallen, box = box.offset(direction))) continue;
                 return false;
             }
             return true;
@@ -217,7 +217,7 @@ public class FallenEntity extends HostileEntity {
             BlockPos blockPos = fallen.getBlockPos();
             for (int i = 0; i < 3; ++i) {
                 BlockPos blockPos2 = blockPos.add(fallen.random.nextInt(15) - 7, fallen.random.nextInt(11) - 5, fallen.random.nextInt(15) - 7);
-                if (!fallen.world.isAir(blockPos2)) continue;
+                if (!fallen.getWorld().isAir(blockPos2)) continue;
                 fallen.moveControl.moveTo((double)blockPos2.getX() + 0.5, (double)blockPos2.getY() + 0.5, (double)blockPos2.getZ() + 0.5, 0.25);
                 if (fallen.getTarget() != null) break;
                 fallen.getLookControl().lookAt((double)blockPos2.getX() + 0.5, (double)blockPos2.getY() + 0.5, (double)blockPos2.getZ() + 0.5, 180.0f, 20.0f);

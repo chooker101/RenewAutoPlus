@@ -1,75 +1,73 @@
 {
-    "temperature": 2,
-    "downfall": 0,
-    "precipitation": "none",
-    "category": "none",
-    "effects": {
-      "sky_color": 16150383,
-      "fog_color": 16037525,
-      "water_color": 15360353,
-      "water_fog_color": 8856098,
-      "grass_color": 15868193,
-      "foliage_color": 15868193,
-      "mood_sound": {
-        "sound": "minecraft:ambient.cave",
-        "tick_delay": 6000,
-        "block_search_extent": 8,
-        "offset": 2
+  "temperature": 2,
+  "downfall": 0,
+  "has_precipitation": false,
+  "effects": {
+    "sky_color": 16150383,
+    "fog_color": 16037525,
+    "water_color": 15360353,
+    "water_fog_color": 8856098,
+    "grass_color": 15868193,
+    "foliage_color": 15868193,
+    "mood_sound": {
+      "sound": "minecraft:ambient.cave",
+      "tick_delay": 6000,
+      "block_search_extent": 8,
+      "offset": 2
+    }
+  },
+  "spawners": {
+    "monster": [
+      {
+        "type": "remew_auto_plus:banished",
+        "weight": 100,
+        "minCount": 4,
+        "maxCount": 4
       }
-    },
-    "spawners": {
-      "monster": [
-        {
-          "type": "remew_auto_plus:banished",
-          "weight": 100,
-          "minCount": 4,
-          "maxCount": 4
-        }
-      ],
-      "creature": [],
-      "ambient": [],
-      "axolotls": [],
-      "underground_water_creature": [],
-      "water_creature": [],
-      "water_ambient": [],
-      "misc": []
-    },
-    "spawn_costs": {},
-    "carvers": {
-      "air": [
-        "minecraft:cave",
-        "minecraft:cave_extra_underground",
-        "minecraft:canyon"
-      ]
-    },
-    "features": [
-      [],
-      [
-        "minecraft:lake_lava_underground",
-        "minecraft:lake_lava_surface"
-      ],
-      [],
-      [
-        "minecraft:monster_room",
-        "minecraft:monster_room_deep"
-      ],
-      [],
-      [],
-      [
-        "renew_auto_plus:terracotta_ore_gold"
-      ],
-      [],
-      [
-        "minecraft:spring_lava"
-      ],
-      [
-        "minecraft:patch_grass_badlands",
-        "minecraft:patch_dead_bush_badlands",
-        "renew_auto_plus:wastes_ruins"
-      ],
-      [
-        "minecraft:freeze_top_layer"
-      ]
+    ],
+    "creature": [],
+    "ambient": [],
+    "axolotls": [],
+    "underground_water_creature": [],
+    "water_creature": [],
+    "water_ambient": [],
+    "misc": []
+  },
+  "spawn_costs": {},
+  "carvers": {
+    "air": [
+      "minecraft:cave",
+      "minecraft:cave_extra_underground",
+      "minecraft:canyon"
     ]
-  }
-  
+  },
+  "features": [
+    [],
+    [
+      "minecraft:lake_lava_underground",
+      "minecraft:lake_lava_surface"
+    ],
+    [],
+    [
+      "minecraft:monster_room",
+      "minecraft:monster_room_deep"
+    ],
+    [],
+    [],
+    [
+      "renew_auto_plus:terracotta_ore_gold"
+    ],
+    [],
+    [
+      "minecraft:spring_lava"
+    ],
+    [
+      "minecraft:patch_grass_badlands",
+      "minecraft:patch_dead_bush_badlands",
+      "renew_auto_plus:wastes_ruins"
+    ],
+    [
+      "minecraft:freeze_top_layer"
+    ]
+  ]
+}

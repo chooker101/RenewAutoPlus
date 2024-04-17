@@ -12,9 +12,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import net.minecraft.util.math.RotationAxis;
 
 @Environment(value=EnvType.CLIENT)
 public class OnyxBasicProjectileEntityRender extends EntityRenderer<OnyxBasicProjectileEntity> {
@@ -34,13 +34,13 @@ public class OnyxBasicProjectileEntityRender extends EntityRenderer<OnyxBasicPro
     public void render(OnyxBasicProjectileEntity magicEntity, float yaw, float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         matrixStack.push();
         matrixStack.translate(0.0, 0.15, 0.0);
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(MathHelper.lerp(tickDelta, magicEntity.prevYaw, magicEntity.getYaw()) - 90.0f));
-        matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(MathHelper.lerp(tickDelta, magicEntity.prevPitch, magicEntity.getPitch())));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.lerp(tickDelta, magicEntity.prevYaw, magicEntity.getYaw()) - 90.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.lerp(tickDelta, magicEntity.prevPitch, magicEntity.getPitch())));
         if(magicEntity.getWasSecond()) {
-            matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(20.0f));
+            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(20.0f));
         }
         else {
-            matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-20.0f));
+            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-20.0f));
         }
         
         matrixStack.scale(0.037125f, 0.037125f, 0.037125f);
@@ -57,8 +57,8 @@ public class OnyxBasicProjectileEntityRender extends EntityRenderer<OnyxBasicPro
         this.vertex(matrix4f, matrix3f, t, 3, 1, 48, 1.0f, 0.0f, 1, 0, 0, i);
         this.vertex(matrix4f, matrix3f, t, 3, -1, 48, 1.0f, 0.09375f, 1, 0, 0, i);
         this.vertex(matrix4f, matrix3f, t, 3, -1, -48, 0.0f, 0.09375f, 1, 0, 0, i);
-        matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
-        matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(90.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(90.0f));
         this.vertex(matrix4f, matrix3f, t, -48, -14, 0, 0.0f, 0.14286f, 0, 1, 0, i);
         this.vertex(matrix4f, matrix3f, t, 48, -14, 0, 1.0f, 0.14286f, 0, 1, 0, i);
         this.vertex(matrix4f, matrix3f, t, 48, 14, 0, 1.0f, 1.0f, 0, 1, 0, i);

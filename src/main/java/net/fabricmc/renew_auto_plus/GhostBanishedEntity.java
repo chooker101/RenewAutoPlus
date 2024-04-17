@@ -36,6 +36,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.TimeHelper;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
+import net.minecraft.world.EntityView;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
@@ -154,5 +155,11 @@ public class GhostBanishedEntity extends TameableEntity implements Angerable {
         //    ghostEntity.setTamed(true);
         //}
         return null;
+    }
+
+    //No clue what this shit is
+    @Override
+    public EntityView method_48926() {
+        return super.getWorld();
     }
 }

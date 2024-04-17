@@ -23,7 +23,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 
 public class RubyWandItem extends RangedWeaponItem implements AttackActionReplacedWithCharge {
@@ -61,7 +60,7 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-        boolean bl = user.getArrowType(itemStack).getCount() >= 3;
+        boolean bl = user.getProjectileType(itemStack).getCount() >= 3;
         user.getItemCooldownManager().set(this, 60);
         if (user.getAbilities().creativeMode || bl) {
             user.setCurrentHand(hand);
@@ -84,10 +83,9 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
             return;
         }
         Vec3d vec3d = user.getRotationVec(1.0f);
-        Vec3f vec3f = new Vec3f(vec3d);
-        RubyBasicProjectileEntity projectileEntity = new RubyBasicProjectileEntity(world, user, vec3f.getX(), vec3f.getY(), vec3f.getZ());
-        projectileEntity.setVelocity(vec3f.getX(), vec3f.getY(), vec3f.getZ(), speed, divergence);
-        projectileEntity.setPosition(user.getX() + vec3f.getX(), (user.getEyeY() - 0.15) + vec3f.getY(), user.getZ() + vec3f.getZ());
+        RubyBasicProjectileEntity projectileEntity = new RubyBasicProjectileEntity(world, user, vec3d.getX(), vec3d.getY(), vec3d.getZ());
+        projectileEntity.setVelocity(vec3d.getX(), vec3d.getY(), vec3d.getZ(), speed, divergence);
+        projectileEntity.setPosition(user.getX() + vec3d.getX(), (user.getEyeY() - 0.15) + vec3d.getY(), user.getZ() + vec3d.getZ());
         float attackCooldownPercentage = ((RubyWandItem)wand.getItem()).getAttackCooldownPercentage();
         if(attackCooldownPercentage > 0.4f) {
             projectileEntity.setCurrentSize(RubyBasicProjectileEntity.Size.SMALL);
@@ -100,7 +98,7 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
         }
         wand.damage(1, user, e -> e.sendToolBreakStatus(hand));
         if (!user.getAbilities().creativeMode) {
-            user.getArrowType(wand).decrement(1);
+            user.getProjectileType(wand).decrement(1);
         }
         world.spawnEntity(projectileEntity);
         //world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1.0f, soundPitch);
@@ -115,14 +113,14 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
         float l = MathHelper.sqrt(g * g + h * h + k * k);
         float m = 2.0f;
         user.addVelocity(g *= m / l, h *= m / l, k *= m / l);
-        user.setRiptideTicks(18);
+        user.useRiptide(18);
         user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 120, 1));
         if (user.isOnGround()) {
             user.move(MovementType.SELF, new Vec3d(0.0, 1.1999999284744263, 0.0));
         }
         wand.damage(1, user, e -> e.sendToolBreakStatus(hand));
         if (!user.getAbilities().creativeMode) {
-            user.getArrowType(wand).decrement(3);
+            user.getProjectileType(wand).decrement(3);
         }
         //world.playSoundFromEntity(null, user, SoundEvents.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 1.0f, 1.0f);
     }
@@ -184,7 +182,7 @@ public class RubyWandItem extends RangedWeaponItem implements AttackActionReplac
     public void stopAttackServer(World world, PlayerEntity user, Hand hand) {
         if(currentAttackTicks < maxAttackTicks){
             ItemStack itemStack = user.getStackInHand(hand);
-            boolean bl = !user.getArrowType(itemStack).isEmpty();
+            boolean bl = !user.getProjectileType(itemStack).isEmpty();
             if (user.getAbilities().creativeMode || bl) {
                 user.setCurrentHand(hand);
                 RubyWandItem.shootBasicAttack(world, user, hand, itemStack, RubyWandItem.getSpeed(), RubyWandItem.getDivergence());

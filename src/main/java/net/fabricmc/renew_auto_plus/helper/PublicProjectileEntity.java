@@ -12,7 +12,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
@@ -25,6 +25,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
+import net.minecraft.network.listener.ClientPlayPacketListener;
 
 // Move to base mod and fix DispenserBobber
 public abstract class PublicProjectileEntity extends Entity {
@@ -53,8 +54,8 @@ public abstract class PublicProjectileEntity extends Entity {
         if (this.owner != null && !this.owner.isRemoved()) {
             return this.owner;
         }
-        if (this.ownerUuid != null && this.world instanceof ServerWorld) {
-            this.owner = ((ServerWorld)this.world).getEntity(this.ownerUuid);
+        if (this.ownerUuid != null && this.getWorld() instanceof ServerWorld) {
+            this.owner = ((ServerWorld)this.getWorld()).getEntity(this.ownerUuid);
             return this.owner;
         }
         return null;
@@ -96,7 +97,7 @@ public abstract class PublicProjectileEntity extends Entity {
     @Override
     public void tick() {
         if (!this.shot) {
-            this.emitGameEvent(GameEvent.PROJECTILE_SHOOT, this.getOwner(), this.getBlockPos());
+            this.emitGameEvent(GameEvent.PROJECTILE_SHOOT, this.getOwner());
             this.shot = true;
         }
         if (!this.leftOwner) {
@@ -107,8 +108,9 @@ public abstract class PublicProjectileEntity extends Entity {
 
     private boolean shouldLeaveOwner() {
         Entity entity2 = this.getOwner();
+        World world = this.getWorld();
         if (entity2 != null) {
-            for (Entity entity22 : this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0), entity -> !entity.isSpectator() && entity.collides())) {
+            for (Entity entity22 : world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0), entity -> entity.canBeHitByProjectile())) {
                 if (entity22.getRootVehicle() != entity2.getRootVehicle()) continue;
                 return false;
             }
@@ -199,7 +201,7 @@ public abstract class PublicProjectileEntity extends Entity {
     }
 
     protected boolean canHit(Entity entity) {
-        if (entity.isSpectator() || !entity.isAlive() || !entity.collides()) {
+        if (!entity.canBeHitByProjectile()) {
             return false;
         }
         Entity entity2 = this.getOwner();
@@ -224,7 +226,7 @@ public abstract class PublicProjectileEntity extends Entity {
     }
 
     @Override
-    public Packet<?> createSpawnPacket() {
+    public Packet<ClientPlayPacketListener> createSpawnPacket() {
         Entity entity = this.getOwner();
         return new EntitySpawnS2CPacket(this, entity == null ? 0 : entity.getId());
     }
@@ -232,7 +234,7 @@ public abstract class PublicProjectileEntity extends Entity {
     @Override
     public void onSpawnPacket(EntitySpawnS2CPacket packet) {
         super.onSpawnPacket(packet);
-        Entity entity = this.world.getEntityById(packet.getEntityData());
+        Entity entity = this.getWorld().getEntityById(packet.getEntityData());
         if (entity != null) {
             this.setOwner(entity);
         }
@@ -251,7 +253,7 @@ public abstract class PublicProjectileEntity extends Entity {
         EntityHitResult hitResult2;
         Vec3d vec3d3;
         Vec3d vec3d = entity.getVelocity();
-        World world = entity.world;
+        World world = entity.getWorld();
         Vec3d vec3d2 = entity.getPos();
         HitResult hitResult = world.raycast(new RaycastContext(vec3d2, vec3d3 = vec3d2.add(vec3d), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, entity));
         if (((HitResult)hitResult).getType() != HitResult.Type.MISS) {

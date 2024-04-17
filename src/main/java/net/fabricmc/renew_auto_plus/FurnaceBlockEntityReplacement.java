@@ -5,34 +5,35 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.recipe.AbstractCookingRecipe;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.SmeltingRecipe;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.screen.FurnaceScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 
 public class FurnaceBlockEntityReplacement extends AbstractFurnaceBlockEntity {
     public int furnaceMaxHeatLevel;
-    TranslatableText containerName;
+    TranslatableTextContent containerName;
 
     public FurnaceBlockEntityReplacement(BlockPos pos, BlockState state) {
         super(RenewAutoPlusInitialize.FURNACE_BLOCK_ENTITY_REPLACEMENT, pos, state, RecipeType.SMELTING);
         furnaceMaxHeatLevel = 38599;
-        containerName = new TranslatableText("container.furnace");
+        containerName = new TranslatableTextContent("container.furnace", "Furnace", null); //Might be fucked IDK?
     }
 
-    public FurnaceBlockEntityReplacement(BlockPos pos, BlockState state, int maxHeatLevel, TranslatableText name) {
+    public FurnaceBlockEntityReplacement(BlockPos pos, BlockState state, int maxHeatLevel, TranslatableTextContent name) {
         super(RenewAutoPlusInitialize.FURNACE_BLOCK_ENTITY_REPLACEMENT, pos, state, RecipeType.SMELTING);
         furnaceMaxHeatLevel = maxHeatLevel;
         containerName = name;
@@ -40,7 +41,7 @@ public class FurnaceBlockEntityReplacement extends AbstractFurnaceBlockEntity {
 
     @Override
     protected Text getContainerName() {
-        return containerName;
+        return Text.of(containerName.toString());
     }
 
     @Override
@@ -98,7 +99,8 @@ public class FurnaceBlockEntityReplacement extends AbstractFurnaceBlockEntity {
         if (slots.get(0).isEmpty() || recipe == null) {
             return false;
         }
-        ItemStack itemStack = recipe.getOutput();
+        @SuppressWarnings("resource")
+        ItemStack itemStack = recipe.getResult(MinecraftClient.getInstance().world.getRegistryManager());
         if (itemStack.isEmpty()) {
             return false;
         }
@@ -106,7 +108,7 @@ public class FurnaceBlockEntityReplacement extends AbstractFurnaceBlockEntity {
         if (itemStack2.isEmpty()) {
             return true;
         }
-        if (!itemStack2.isItemEqualIgnoreDamage(itemStack)) {
+        if (!ItemStack.areEqual(itemStack, itemStack2)) {
             return false;
         }
         if (itemStack2.getCount() < count && itemStack2.getCount() < itemStack2.getMaxCount()) {
@@ -120,7 +122,8 @@ public class FurnaceBlockEntityReplacement extends AbstractFurnaceBlockEntity {
             return false;
         }
         ItemStack itemStack = slots.get(0);
-        ItemStack itemStack2 = recipe.getOutput();
+        @SuppressWarnings("resource")
+        ItemStack itemStack2 = recipe.getResult(MinecraftClient.getInstance().world.getRegistryManager());
         ItemStack itemStack3 = slots.get(2);
         if (itemStack3.isEmpty()) {
             slots.set(2, itemStack2.copy());
@@ -182,7 +185,9 @@ public class FurnaceBlockEntityReplacement extends AbstractFurnaceBlockEntity {
         }
         ItemStack itemStack = blockEntity.inventory.get(1);
         if (isBurning(blockEntity) || !itemStack.isEmpty() && !blockEntity.inventory.get(0).isEmpty()) {
-            Recipe<Inventory> recipe = world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, blockEntityRaw, world).orElse(null);
+            RecipeEntry<SmeltingRecipe> recipeEntry = world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, blockEntity, world).orElse(null); //Changed from raw
+            if(recipeEntry == null) { return; }
+            SmeltingRecipe recipe = recipeEntry.value(); //Changed to smelting recipe from Recipe<Inventory>
             int i = blockEntity.getMaxCountPerStack();
             if(remainder == 0.0f) {
                 if((isBurning(blockEntity) && getMinHeatLevel(blockEntity.inventory.get(0)) >= getBurnTime(blockEntity)) && getMaxHeatLevel(itemStack) > (getBurnTime(blockEntity) + getFuelTime(blockEntity))) {
@@ -216,9 +221,9 @@ public class FurnaceBlockEntityReplacement extends AbstractFurnaceBlockEntity {
                 setCookTime(blockEntity, getCookTime(blockEntity) + 1);
                 if (getCookTime(blockEntity) == getCookTimeTotal(blockEntity)) {
                     setCookTime(blockEntity, 0);
-                    setCookTimeTotal(blockEntity, world.getRecipeManager().getFirstMatch(RecipeType.SMELTING, blockEntity, world).map(AbstractCookingRecipe::getCookTime).orElse(200));
+                    setCookTimeTotal(blockEntity, recipe.getCookingTime()); //Changed from full regrab for smelting recipe
                     if (craftRecipe(recipe, blockEntity.inventory, i)) {
-                        blockEntity.setLastRecipe(recipe);
+                        blockEntity.setLastRecipe(recipeEntry); //Changed to use entry from above as now requires entry
                     }
                     updateBlock = true;
                 }

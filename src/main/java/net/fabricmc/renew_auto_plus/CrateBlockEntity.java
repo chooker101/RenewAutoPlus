@@ -15,7 +15,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 
@@ -88,7 +87,7 @@ public class CrateBlockEntity extends LockableContainerBlockEntity implements Ex
     @Override
     public void setStack(int slot, ItemStack stack) {
         ItemStack itemStack = this.inventory.get(slot);
-        boolean bl = !stack.isEmpty() && stack.isItemEqualIgnoreDamage(itemStack) && ItemStack.areNbtEqual(stack, itemStack);
+        boolean bl = !stack.isEmpty() && ItemStack.canCombine(stack, itemStack);
         this.inventory.set(slot, stack);
         if (stack.getCount() > this.getMaxCountPerStack()) {
             stack.setCount(this.getMaxCountPerStack());
@@ -112,7 +111,7 @@ public class CrateBlockEntity extends LockableContainerBlockEntity implements Ex
 
     @Override
     protected Text getContainerName() {
-        return new TranslatableText(getCachedState().getBlock().getTranslationKey());
+        return Text.translatable(getCachedState().getBlock().getTranslationKey());
     }
 
     @Override
@@ -133,7 +132,7 @@ public class CrateBlockEntity extends LockableContainerBlockEntity implements Ex
             if(Objects.equals(company.getKey(), this.companyName)) {
                 if(this.getPos().isWithinDistance(company.getValue().getPos(), closestDistance)){
                     currentClosest = company;
-                    closestDistance = (int)this.getPos().getSquaredDistance(currentClosest.getValue().getPos(), true);
+                    closestDistance = (int)this.getPos().getSquaredDistance(currentClosest.getValue().getPos());
                 }
             }
         }

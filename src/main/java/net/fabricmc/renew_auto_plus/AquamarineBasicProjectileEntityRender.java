@@ -12,9 +12,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import net.minecraft.util.math.RotationAxis;
 
 @Environment(value=EnvType.CLIENT)
 public class AquamarineBasicProjectileEntityRender extends EntityRenderer<AquamarineBasicProjectileEntity> {
@@ -33,9 +33,9 @@ public class AquamarineBasicProjectileEntityRender extends EntityRenderer<Aquama
     @Override
     public void render(AquamarineBasicProjectileEntity magicEntity, float yaw, float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
         matrixStack.push();
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(MathHelper.lerp(tickDelta, magicEntity.prevYaw, magicEntity.getYaw()) - 90.0f));
-        matrixStack.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(MathHelper.lerp(tickDelta, magicEntity.prevPitch, magicEntity.getPitch())));
-        matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(45.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.lerp(tickDelta, magicEntity.prevYaw, magicEntity.getYaw()) - 90.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(MathHelper.lerp(tickDelta, magicEntity.prevPitch, magicEntity.getPitch())));
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(45.0f));
         matrixStack.scale(0.05625f, 0.05625f, 0.05625f);
         matrixStack.translate(-4.0, 0.0, 0.0);
         VertexConsumer t = vertexConsumerProvider.getBuffer(LAYER);
@@ -51,7 +51,7 @@ public class AquamarineBasicProjectileEntityRender extends EntityRenderer<Aquama
         this.vertex(matrix4f, matrix3f, t, -5, -2, 2, 0.15625f, 0.3125f, 1, 0, 0, i);
         this.vertex(matrix4f, matrix3f, t, -5, -2, -2, 0.0f, 0.3125f, 1, 0, 0, i);
         for (int u = 0; u < 2; ++u) {
-            matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
+            matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0f));
             this.vertex(matrix4f, matrix3f, t, -8, -2, 0, 0.0f, 0.0f, 0, 1, 0, i);
             this.vertex(matrix4f, matrix3f, t, 8, -2, 0, 0.5f, 0.0f, 0, 1, 0, i);
             this.vertex(matrix4f, matrix3f, t, 8, 2, 0, 0.5f, 0.15625f, 0, 1, 0, i);

@@ -16,9 +16,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import net.minecraft.util.math.RotationAxis;
 
 @Environment(value=EnvType.CLIENT)
 public class TopazBeamFeatureRenderer<T extends LivingEntity>
@@ -76,7 +76,7 @@ extends FeatureRenderer<T, PlayerEntityModel<T>> {
         }
         if(wand.isHitting()) {
             matrixStack.translate(0.0, -0.3, -(double)segments - 0.5);
-            matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(45.0f));
+            matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(45.0f));
             TopazBeamFeatureRenderer.renderHitEffect(wand, matrixStack, vertexConsumerProvider, light, tickDelta, segments);
         }
         matrixStack.pop();
@@ -94,7 +94,7 @@ extends FeatureRenderer<T, PlayerEntityModel<T>> {
         vertexConsumer.vertex(positionMatrix, 1.0f - 0.5f, 0.0f - 0.25f, 0.0f).color(255, 255, 255, 255).texture(1.0f, vFramePosition + 0.25f).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(normalMatrix, 0.0f, 1.0f, 0.0f).next();
         vertexConsumer.vertex(positionMatrix, 1.0f - 0.5f, 1.0f - 0.25f, 0.0f).color(255, 255, 255, 255).texture(1.0f, vFramePosition).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(normalMatrix, 0.0f, 1.0f, 0.0f).next();
         vertexConsumer.vertex(positionMatrix, 0.0f - 0.5f, 1.0f - 0.25f, 0.0f).color(255, 255, 255, 255).texture(0.0f, vFramePosition).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(normalMatrix, 0.0f, 1.0f, 0.0f).next();
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90.0f));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90.0f));
         vertexConsumer.vertex(positionMatrix, 0.0f - 0.5f, 0.0f - 0.25f, 0.0f).color(255, 255, 255, 255).texture(0.0f, vFramePosition + 0.25f).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(normalMatrix, 0.0f, 1.0f, 0.0f).next();
         vertexConsumer.vertex(positionMatrix, 1.0f - 0.5f, 0.0f - 0.25f, 0.0f).color(255, 255, 255, 255).texture(1.0f, vFramePosition + 0.25f).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(normalMatrix, 0.0f, 1.0f, 0.0f).next();
         vertexConsumer.vertex(positionMatrix, 1.0f - 0.5f, 1.0f - 0.25f, 0.0f).color(255, 255, 255, 255).texture(1.0f, vFramePosition).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(normalMatrix, 0.0f, 1.0f, 0.0f).next();
@@ -113,10 +113,10 @@ extends FeatureRenderer<T, PlayerEntityModel<T>> {
         float j = 1.0f;
         float k = 1.0f;
         float l = 1.0f;
-        matrixStack.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-90.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0f));
         matrixStack.push();
         VertexConsumer vertexConsumerTranslucent = vertexConsumerProvider.getBuffer(INNER_LAYER);
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(f * 9.0f - 45.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(f * 9.0f - 45.0f));
         float m = 0.0f;
         float n = innerRadius;
         float o = innerRadius;
@@ -131,7 +131,7 @@ extends FeatureRenderer<T, PlayerEntityModel<T>> {
         matrixStack.pop();
         matrixStack.push();
         VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(OUTER_LAYER);
-        matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(-f2 * 9.0f + 45.0f));
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-f2 * 9.0f + 45.0f));
         m = -outerRadius;
         n = -outerRadius;
         o = outerRadius;
@@ -141,7 +141,7 @@ extends FeatureRenderer<T, PlayerEntityModel<T>> {
         s = outerRadius;
         t = outerRadius;
         if(yOffset % 8 > 3) {
-            matrixStack.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
+            matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
         }
         MatrixStack.Entry entry = matrixStack.peek();
         Matrix4f matrix4f = entry.getPositionMatrix();

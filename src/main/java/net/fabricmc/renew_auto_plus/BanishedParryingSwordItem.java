@@ -16,7 +16,6 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.boss.dragon.EnderDragonPart;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -39,6 +38,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+@SuppressWarnings("resource")
 public class BanishedParryingSwordItem extends ToolItem {
     private final float attackDamage;
     private final Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
@@ -81,7 +81,7 @@ public class BanishedParryingSwordItem extends ToolItem {
                 maxUseTime = 6;
                 user.setCurrentHand(hand);
                 maxUseTime = 11; // Jank to stop 5 frame startup of block
-                user.world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, user.getSoundCategory(), 1.0f, 1.0f);
+                world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, user.getSoundCategory(), 1.0f, 1.0f);
                 user.spawnSweepAttackParticles();
                 return TypedActionResult.pass(itemStack);
             }
@@ -97,7 +97,7 @@ public class BanishedParryingSwordItem extends ToolItem {
             return ActionResult.PASS;
         }
         else {
-            if(!user.world.isClient()) {
+            if(!user.getWorld().isClient()) {
                 maxUseTime = 6;
                 user.setCurrentHand(hand);
                 maxUseTime = 11;
@@ -160,7 +160,7 @@ public class BanishedParryingSwordItem extends ToolItem {
             int i = 0;
             i += EnchantmentHelper.getKnockback(player);
             if (player.isSprinting() && bl) {
-                player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, player.getSoundCategory(), 1.0f, 1.0f);
+                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK, player.getSoundCategory(), 1.0f, 1.0f);
                 ++i;
                 bl2 = true;
             }
@@ -187,7 +187,7 @@ public class BanishedParryingSwordItem extends ToolItem {
             }
             Vec3d vec3d = target.getVelocity();
             target.timeUntilRegen = 0;
-            boolean bl6 = target.damage(DamageSource.player(player), f);
+            boolean bl6 = target.damage(player.getWorld().getDamageSources().playerAttack(player), f);
             if (bl6) {
                 List<LivingEntity> list;
                 if (i > 0) {
@@ -201,15 +201,15 @@ public class BanishedParryingSwordItem extends ToolItem {
                 }
                 if (bl42) {
                     float k = 1.0f + EnchantmentHelper.getSweepingMultiplier(player) * f;
-                    list = player.world.getNonSpectatingEntities(LivingEntity.class, target.getBoundingBox().expand(1.0, 0.25, 1.0));
+                    list = player.getWorld().getNonSpectatingEntities(LivingEntity.class, target.getBoundingBox().expand(1.0, 0.25, 1.0));
                     Iterator<LivingEntity> iterator = list.iterator();
                     while (iterator.hasNext()) {
                         LivingEntity livingEntity = iterator.next();
                         if (livingEntity == player || livingEntity == target || player.isTeammate(livingEntity) || livingEntity instanceof ArmorStandEntity && ((ArmorStandEntity)livingEntity).isMarker() || !(player.squaredDistanceTo(livingEntity) < 9.0)) continue;
                         livingEntity.takeKnockback(0.4f, MathHelper.sin(player.getYaw() * ((float)Math.PI / 180)), -MathHelper.cos(player.getYaw() * ((float)Math.PI / 180)));
-                        livingEntity.damage(DamageSource.player(player), k);
+                        livingEntity.damage(player.getWorld().getDamageSources().playerAttack(player), k);
                     }
-                    player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0f, 1.0f);
+                    player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP, player.getSoundCategory(), 1.0f, 1.0f);
                     player.spawnSweepAttackParticles();
                 }
                 if (target instanceof ServerPlayerEntity && target.velocityModified) {
@@ -218,14 +218,14 @@ public class BanishedParryingSwordItem extends ToolItem {
                     target.setVelocity(vec3d);
                 }
                 if (bl3) {
-                    player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, player.getSoundCategory(), 1.0f, 1.0f);
+                    player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, player.getSoundCategory(), 1.0f, 1.0f);
                     player.addCritParticles(target);
                 }
                 if (!bl3 && !bl42) {
                     if (bl) {
-                        player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, player.getSoundCategory(), 1.0f, 1.0f);
+                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_STRONG, player.getSoundCategory(), 1.0f, 1.0f);
                     } else {
-                        player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, player.getSoundCategory(), 1.0f, 1.0f);
+                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_WEAK, player.getSoundCategory(), 1.0f, 1.0f);
                     }
                 }
                 if (g > 0.0f) {
@@ -241,7 +241,7 @@ public class BanishedParryingSwordItem extends ToolItem {
                 if (target instanceof EnderDragonPart) {
                     entity4 = ((EnderDragonPart)target).owner;
                 }
-                if (!player.world.isClient && !k.isEmpty() && entity4 instanceof LivingEntity) {
+                if (!player.getWorld().isClient && !k.isEmpty() && entity4 instanceof LivingEntity) {
                     k.postHit((LivingEntity)entity4, player);
                     if (k.isEmpty()) {
                         player.setStackInHand(hand, ItemStack.EMPTY);
@@ -253,14 +253,14 @@ public class BanishedParryingSwordItem extends ToolItem {
                     if (j > 0) {
                         target.setOnFireFor(j * 4);
                     }
-                    if (player.world instanceof ServerWorld && l > 2.0f) {
+                    if (player.getWorld() instanceof ServerWorld && l > 2.0f) {
                         int livingEntity = (int)((double)l * 0.5);
-                        ((ServerWorld)player.world).spawnParticles(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getBodyY(0.5), target.getZ(), livingEntity, 0.1, 0.0, 0.1, 0.2);
+                        ((ServerWorld)player.getWorld()).spawnParticles(ParticleTypes.DAMAGE_INDICATOR, target.getX(), target.getBodyY(0.5), target.getZ(), livingEntity, 0.1, 0.0, 0.1, 0.2);
                     }
                 }
                 player.addExhaustion(0.1f);
             } else {
-                player.world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, player.getSoundCategory(), 1.0f, 1.0f);
+                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_PLAYER_ATTACK_NODAMAGE, player.getSoundCategory(), 1.0f, 1.0f);
                 if (bl5) {
                     target.extinguish();
                 }

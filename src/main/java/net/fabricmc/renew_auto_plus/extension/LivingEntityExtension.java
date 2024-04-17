@@ -69,7 +69,8 @@ public abstract class LivingEntityExtension extends Entity {
             if (this.horizontalCollision) {
                 this.riptideTicks = 0;
             }
-            if (!this.world.isClient && this.riptideTicks <= 0) {
+            World world = this.getWorld();
+            if (!world.isClient && this.riptideTicks <= 0) {
                 this.setLivingFlag(4, false);
             }
             info.cancel();

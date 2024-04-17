@@ -1,6 +1,6 @@
 package net.fabricmc.renew_auto_plus;
 
-import net.minecraft.network.Packet;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ServerPlayPacketListener;
 import net.minecraft.server.network.ServerPlayNetworkHandler;

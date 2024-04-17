@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -50,7 +51,7 @@ public abstract class MinecraftClientExtension extends ReentrantThreadExecutor<R
     public abstract ClientPlayNetworkHandler getNetworkHandler();
 
     @Shadow
-    private void doAttack() {}
+    private boolean doAttack() {return false;}
 
     @Inject(method = "handleBlockBreaking(Z)V", at = @At("HEAD"), cancellable = true)
     private void handleBlockBreakingEarlyReturn(boolean bl, CallbackInfo info) {
@@ -61,33 +62,37 @@ public abstract class MinecraftClientExtension extends ReentrantThreadExecutor<R
         }
     }
 
-    @Inject(method = "doAttack()V", at = @At("HEAD"), cancellable = true)
-    private void doAttackEarlyReturn(CallbackInfo info) {
+    @Inject(method = "doAttack()Z", at = @At("HEAD"), cancellable = true)
+    private boolean doAttackEarlyReturn(CallbackInfoReturnable<Boolean> info) {
         if (this.attackCooldown == 10000) {
+            info.setReturnValue(false);
             info.cancel();
-            return;
+            return false;
         }
         ItemStack mainHandItem = this.player.getStackInHand(Hand.MAIN_HAND);
         if(mainHandItem.getItem() instanceof AttackActionReplaced){
             if(!((AttackActionReplaced)mainHandItem.getItem()).canAttack(player)) {
+                info.setReturnValue(false);
                 info.cancel();
-                return;
+                return false;
             }
             PacketByteBuf byteBuf = new PacketByteBuf(Unpooled.buffer());
             ReplacedOnAttackC2SPacket packet = new ReplacedOnAttackC2SPacket(Hand.MAIN_HAND);
             packet.write(byteBuf);
             this.getNetworkHandler().sendPacket(ClientPlayNetworking.createC2SPacket(RenewAutoPlusInitialize.REPLACED_ON_ATTACK_PACKET_ID, byteBuf));
             ((AttackActionReplaced)mainHandItem.getItem()).onAttackClient(this.world, this.player, Hand.MAIN_HAND);
+            info.setReturnValue(true);
             info.cancel();
-            return;
+            return true;
         }
+        return true;
     }
 
     @Inject(method = "handleInputEvents()V", at = @At("RETURN"), cancellable = true)
     private void handleInputEventsExtension(CallbackInfo info) {
         ItemStack mainHandItem = this.player.getStackInHand(Hand.MAIN_HAND);
         if(mainHandItem.getItem() instanceof AttackActionReplacedWithCharge){
-            if (this.options.keyAttack.isPressed()) {
+            if (this.options.attackKey.isPressed()) {
                 wasAttackPressedLastFrame = true;
                 this.doAttack();
             }

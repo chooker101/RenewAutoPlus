@@ -13,8 +13,8 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix4f;
+import net.minecraft.util.math.RotationAxis;
 
 @Environment(value=EnvType.CLIENT)
 public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntityRenderer<T> {
@@ -68,18 +68,18 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
         }
         else if(facing == Direction.EAST) {
             matrices.translate(168.0 - (48 - Math.cos(ySineInRadians) * 48), 104.0 - (Math.sin(ySineInRadians) * 48), 56.0);
-            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(270));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(270));
         }
         else if(facing == Direction.SOUTH) {
             matrices.translate(72.0, 104.0 - (Math.sin(ySineInRadians) * 48), 168.0 - (48 - Math.cos(ySineInRadians) * 48));
-            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
         }
         else if(facing == Direction.WEST) {
             matrices.translate(-40.0 + (48 - Math.cos(ySineInRadians) * 48), 104.0 - (Math.sin(ySineInRadians) * 48), 72.0);
-            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90));
         }
 
-        matrices.multiply(Vec3f.POSITIVE_X.getRadialQuaternion(-ySineInRadians));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotation(-ySineInRadians));
 
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(this.handleRenderLayer);
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
@@ -91,7 +91,7 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
         vertexConsumer.vertex(matrix4f, 0.0f, 0.0f, 0.0f).color(160, 160, 160, 255).texture(0.0f, 0.5f).light(lightAbove).next();
         
         //left
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90.0f));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90.0f));
         matrices.translate(-64.0, 0.0, 0.0);
         matrix4f = matrices.peek().getPositionMatrix();
         
@@ -101,7 +101,7 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
         vertexConsumer.vertex(matrix4f, 0.0f, 0.0f, 0.0f).color(160, 160, 160, 255).texture(0.125f, 0.0f).light(lightAbove).next();
         
         //right
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
         matrices.translate(-64.0, 0.0, -16.0);
         matrix4f = matrices.peek().getPositionMatrix();
         
@@ -111,7 +111,7 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
         vertexConsumer.vertex(matrix4f, 0.0f, 0.0f, 0.0f).color(160, 160, 160, 255).texture(0.125f, 0.0f).light(lightAbove).next();
 
         //back
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(270.0f));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(270.0f));
         matrices.translate(0.0, 0.0, -64.0);
         matrix4f = matrices.peek().getPositionMatrix();
         
@@ -121,7 +121,7 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
         vertexConsumer.vertex(matrix4f, 0.0f, 0.0f, 0.0f).color(160, 160, 160, 255).texture(0.0f, 0.5f).light(lightAbove).next();
         
         //up
-        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0f));
         matrices.translate(0.0, 0.0, -8.0);
         matrix4f = matrices.peek().getPositionMatrix();
 
@@ -131,7 +131,7 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
         vertexConsumer.vertex(matrix4f, 0.0f, 0.0f, 0.0f).color(224, 224, 224, 255).texture(0.0f, 0.0f).light(lightAbove).next();
         
         //down
-        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(180.0f));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0f));
         matrices.translate(0.0, -64.0, -8.0);
         matrix4f = matrices.peek().getPositionMatrix();
 
@@ -157,18 +157,18 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
             }
             else if(facing == Direction.EAST) {
                 matrices.translate(88.0, 72.0, 56.0);
-                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(270));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(270));
             }
             else if(facing == Direction.SOUTH) {
                 matrices.translate(72.0, 72.0, 88.0);
-                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
             }
             else if(facing == Direction.WEST) {
                 matrices.translate(40.0, 72.0, 72.0);
-                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90));
             }
 
-            matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0f));
             if(state.get(PumpBlock.LIQUID_TYPE)) {
                 vertexConsumer = vertexConsumers.getBuffer(this.waterRenderLayer);
                 alpha = 160;
@@ -195,7 +195,7 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
             }
             
             //left
-            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90.0f));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90.0f));
             matrices.translate(-64.0, 0.0, 0.0);
             matrix4f = matrices.peek().getPositionMatrix();
             
@@ -207,7 +207,7 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
             }
             
             //right
-            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
             matrices.translate(-64.0, 0.0, -16.0);
             matrix4f = matrices.peek().getPositionMatrix();
             
@@ -219,9 +219,9 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
             }
             
             //front
-            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(270.0f));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(270.0f));
             matrices.translate(0.0, 0.0, -64.0);
-            matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0f));
             matrices.translate(0.0, 0.0, -8.0);
             matrix4f = matrices.peek().getPositionMatrix();
 
@@ -233,7 +233,7 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
             }
             
             //back
-            matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(180.0f));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0f));
             matrices.translate(0.0, -64.0, -8.0);
             matrix4f = matrices.peek().getPositionMatrix();
 
@@ -256,17 +256,17 @@ public class PumpBlockEntityRender<T extends BlockEntity> implements BlockEntity
             }
             else if(facing == Direction.EAST) {
                 matrices.translate(88.0, 8.0 + levelHeight, 24.0);
-                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(270));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(270));
             }
             else if(facing == Direction.SOUTH) {
                 matrices.translate(104.0, 8.0 + levelHeight, 88.0);
-                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
             }
             else if(facing == Direction.WEST) {
                 matrices.translate(40.0, 8.0 + levelHeight, 104.0);
-                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90));
             }
-            matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(90.0f));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90.0f));
             if(state.get(PumpBlock.LIQUID_TYPE)) {
                 vertexConsumer = vertexConsumers.getBuffer(this.waterRenderLayer);
                 alpha = 160;

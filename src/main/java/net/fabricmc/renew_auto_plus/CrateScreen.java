@@ -6,15 +6,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 public class CrateScreen extends HandledScreen<CrateScreenHandler> {
@@ -25,7 +23,7 @@ public class CrateScreen extends HandledScreen<CrateScreenHandler> {
     private TextFieldWidget companyNameBox;
  
     public CrateScreen(CrateScreenHandler handler, PlayerInventory inventory, Text text) {
-        super(handler, inventory, new LiteralText(text.getString() + " [" + handler.getBlockPos().toShortString() + "]").setStyle(text.getStyle()));
+        super(handler, inventory, Text.of(text.getString() + " [" + handler.getBlockPos().toShortString() + "]"));
     }
 
     @Override
@@ -36,40 +34,41 @@ public class CrateScreen extends HandledScreen<CrateScreenHandler> {
         titleY = -32;
         playerInventoryTitleY = 110;
 
-        this.client.keyboard.setRepeatEvents(true);
-        this.companyNameBox = new TextFieldWidget(this.textRenderer, this.x + 27, this.y - 16, 94, this.textRenderer.fontHeight, new TranslatableText("itemGroup.search"));
+        //this.client.keyboard.setRepeatEvents(true);
+        this.companyNameBox = new TextFieldWidget(this.textRenderer, this.x + 27, this.y - 16, 94, this.textRenderer.fontHeight, Text.translatable("itemGroup.search"));
         this.companyNameBox.setMaxLength(20);
         this.companyNameBox.setDrawsBackground(false);
         this.companyNameBox.setVisible(true);
         this.companyNameBox.setEditableColor(0xFFFFFF);
         this.companyNameBox.setText(handler.getCurrentCompanyName());
-        this.companyNameBox.setFocusUnlocked(false);
-        this.companyNameBox.setTextFieldFocused(true);
+        this.companyNameBox.setFocusUnlocked(true);
+        this.companyNameBox.setFocused(true);
 
         this.addSelectableChild(this.companyNameBox);
     }
  
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
-        drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
+        context.drawTexture(TEXTURE, x, y, 0, 0, backgroundWidth, backgroundHeight);
         int u = mouseX - (this.x + comfirmButtonX);
         int v = mouseY - (this.y + comfirmButtonY);
         if(u >= 0 && v >= 0 && u < 18 && v < 18) {
-            this.drawTexture(matrices, this.x + comfirmButtonX, this.y + comfirmButtonY, 176, 0, 18, 18);
+            context.drawTexture(TEXTURE, this.x + comfirmButtonX, this.y + comfirmButtonY, 176, 0, 18, 18);
         }
-        this.companyNameBox.render(matrices, mouseX, mouseY, delta);
+        this.companyNameBox.render(context, mouseX, mouseY, delta);
     }
  
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        renderBackground(matrices);
-        super.render(matrices, mouseX, mouseY, delta);
-        drawMouseoverTooltip(matrices, mouseX, mouseY);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderBackground(context, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
+        drawMouseoverTooltip(context, mouseX, mouseY);
     }
  
     @Override
@@ -87,12 +86,13 @@ public class CrateScreen extends HandledScreen<CrateScreenHandler> {
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
+    //Remove if not needed
     @Override
     public void handledScreenTick() {
         super.handledScreenTick();
-        if (this.companyNameBox != null) {
-            this.companyNameBox.tick();
-        }
+        //if (this.companyNameBox != null) {
+        //    this.companyNameBox.tick();
+        //}
     }
 
     @Override

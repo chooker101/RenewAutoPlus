@@ -8,7 +8,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.network.Packet;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
@@ -69,13 +70,14 @@ public class AbstractMagicProjectileEntity extends PublicProjectileEntity {
     public void tick() {
         HitResult hitResult;
         Entity entity = this.getOwner();
-        if (!this.world.isClient && (entity != null && entity.isRemoved() || entity == null)) {
+        World world = getWorld();
+        if (!world.isClient && (entity != null && entity.isRemoved() || entity == null)) {
             this.discard();
             return;
         }
         super.tick();
         if (this.hasHitBlock && earlyOutOnBlockHit()) {
-            if(!this.world.isClient){
+            if(!world.isClient){
                 this.age();
             }
             this.spawnTrailParticles(this.getX(), this.getY(), this.getZ());
@@ -93,7 +95,7 @@ public class AbstractMagicProjectileEntity extends PublicProjectileEntity {
         float g = this.getDrag();
         if (this.isTouchingWater()) {
             for (int i = 0; i < 4; ++i) {
-                this.world.addParticle(ParticleTypes.BUBBLE, d - vec3d.x * 0.25, e - vec3d.y * 0.25, f - vec3d.z * 0.25, vec3d.x, vec3d.y, vec3d.z);
+                world.addParticle(ParticleTypes.BUBBLE, d - vec3d.x * 0.25, e - vec3d.y * 0.25, f - vec3d.z * 0.25, vec3d.x, vec3d.y, vec3d.z);
             }
             g = 0.8f * g;
         }
@@ -133,7 +135,7 @@ public class AbstractMagicProjectileEntity extends PublicProjectileEntity {
     }
 
     protected void spawnTrailParticles(double d, double e, double f) {
-        this.world.addParticle(this.getParticleType(), d, e + 0.25, f, 0.0, 0.0, 0.0);
+        this.getWorld().addParticle(this.getParticleType(), d, e + 0.25, f, 0.0, 0.0, 0.0);
     }
 
     protected void age() {
@@ -213,10 +215,11 @@ public class AbstractMagicProjectileEntity extends PublicProjectileEntity {
     }
 
     @Override
-    public Packet<?> createSpawnPacket() {
+    public Packet<ClientPlayPacketListener> createSpawnPacket() {
         Entity entity = this.getOwner();
-        int i = entity == null ? 0 : entity.getId();
-        return new EntitySpawnS2CPacket(this.getId(), this.getUuid(), this.getX(), this.getY(), this.getZ(), this.getPitch(), this.getYaw(), this.getType(), i, new Vec3d(this.powerX, this.powerY, this.powerZ));
+        //int i = entity == null ? 0 : entity.getId();
+        //return new EntitySpawnS2CPacket(this.getId(), this.getUuid(), this.getX(), this.getY(), this.getZ(), this.getPitch(), this.getYaw(), this.getType(), i, new Vec3d(this.powerX, this.powerY, this.powerZ));
+        return new EntitySpawnS2CPacket(this, entity == null ? 0 : entity.getId());
     }
 
     @Override

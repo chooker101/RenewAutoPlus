@@ -1,5 +1,7 @@
 package net.fabricmc.renew_auto_plus;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -12,9 +14,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class CrateBlock extends BlockWithEntity {
+    public static final MapCodec<CrateBlock> CODEC = CrateBlock.createCodec(CrateBlock::new);
 
     protected CrateBlock(Settings settings) {
         super(settings);
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
     }
 
     @Override

@@ -16,7 +16,7 @@ public class ReplacedOnAttackPlayChannelHandler implements PlayChannelHandler {
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         ReplacedOnAttackC2SPacket packet = new ReplacedOnAttackC2SPacket(buf);
         try{
-            NetworkThreadUtils.forceMainThread(packet, handler, player.getWorld());
+            NetworkThreadUtils.forceMainThread(packet, handler, player.getServerWorld());
         }
         catch(Exception e) {
             return;
@@ -24,11 +24,11 @@ public class ReplacedOnAttackPlayChannelHandler implements PlayChannelHandler {
     }
 
     public static void onReplacedOnAttack(ServerPlayerEntity player, ServerPlayNetworkHandler handler, ReplacedOnAttackC2SPacket packet) {
-        if(player.world != null) {
+        if(player.getWorld() != null) {
             Hand hand = packet.getHand();
             ItemStack handItem = player.getStackInHand(hand);
             if(handItem.getItem() instanceof AttackActionReplaced){
-                ((AttackActionReplaced)handItem.getItem()).onAttackServer(player.world, player, hand);
+                ((AttackActionReplaced)handItem.getItem()).onAttackServer(player.getWorld(), player, hand);
             }
         }
     }

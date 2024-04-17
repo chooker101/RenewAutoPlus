@@ -6,10 +6,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.ProjectileDamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -30,12 +30,13 @@ public class AquamarineSpecialProjectileEntity extends AbstractMagicProjectileEn
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
-        if (this.world.isClient) {
+        World world = this.getWorld();
+        if (world.isClient) {
             return;
         }
         Entity entity = entityHitResult.getEntity();
         Entity owner = this.getOwner();
-        entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 2.0f);
+        entity.damage(new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(RenewAutoPlusInitialize.DIRECT_MAGIC), this, owner), 2.0f);
         if(entity instanceof LivingEntity) {
             if(!((LivingEntity)entity).hasStatusEffect(RenewAutoPlusInitialize.ICEBOUND_RESISTANCE)){
                 ((LivingEntity)entity).addStatusEffect(new StatusEffectInstance(RenewAutoPlusInitialize.ICEBOUND, 100, 1), owner);
@@ -51,7 +52,8 @@ public class AquamarineSpecialProjectileEntity extends AbstractMagicProjectileEn
     @Override
     protected void onCollision(HitResult hitResult) {
         super.onCollision(hitResult);
-        if (!this.world.isClient) {
+        World world = this.getWorld();
+        if (!world.isClient) {
             if (hitResult.getType() == HitResult.Type.ENTITY && this.isOwner(((EntityHitResult)hitResult).getEntity())) {
                 return;
             }
@@ -70,14 +72,15 @@ public class AquamarineSpecialProjectileEntity extends AbstractMagicProjectileEn
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        if (!this.world.isClient) {
+        World world = this.getWorld();
+        if (!world.isClient) {
             if(hasHitBlock) {
                 this.discard();
                 this.setOwner(null);
             }
         }
         super.onBlockHit(blockHitResult);
-        if(this.world.isClient){
+        if(world.isClient){
             world.addBlockBreakParticles(blockHitResult.getBlockPos(), world.getBlockState(blockHitResult.getBlockPos()));
         }
     }

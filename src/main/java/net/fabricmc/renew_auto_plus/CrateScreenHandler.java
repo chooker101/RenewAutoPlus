@@ -49,9 +49,10 @@ public class CrateScreenHandler extends ScreenHandler {
  
     }
 
+    @SuppressWarnings("resource")
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
-        player.world.playSound(null, player.getBlockPos(), SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 1.0f, player.world.random.nextFloat() * 0.1f + 0.9f);
+        player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.BLOCKS, 1.0f, player.getWorld().random.nextFloat() * 0.1f + 0.9f);
         return true;
     }
  
@@ -61,7 +62,7 @@ public class CrateScreenHandler extends ScreenHandler {
     }
  
     @Override
-    public ItemStack transferSlot(PlayerEntity player, int invSlot) {
+    public ItemStack quickMove(PlayerEntity player, int invSlot) {
         ItemStack newStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(invSlot);
         if (slot != null && slot.hasStack()) {

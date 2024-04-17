@@ -61,17 +61,18 @@ public class WastesPortalControllerScreenHandler extends ScreenHandler {
         return this.inventory.canPlayerUse(player);
     }
 
+    @SuppressWarnings("resource")
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
         if(id != 0) {
             return false;
         }
-        player.world.playSound(null, player.getBlockPos(), SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 1.0f, player.world.random.nextFloat() * 0.1f + 0.9f);
+        player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.BLOCKS, 1.0f, player.getWorld().random.nextFloat() * 0.1f + 0.9f);
         return true;
     }
  
     @Override
-    public ItemStack transferSlot(PlayerEntity player, int invSlot) {
+    public ItemStack quickMove(PlayerEntity player, int invSlot) {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = (Slot)this.slots.get(invSlot);
         if (slot != null && slot.hasStack()) {
@@ -142,8 +143,8 @@ public class WastesPortalControllerScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
         this.inventory.onClose(player);
         this.storedInventory.onClose(player);
         if (player instanceof ServerPlayerEntity) {

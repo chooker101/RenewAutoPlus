@@ -1,6 +1,7 @@
 package net.fabricmc.renew_auto_plus;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -22,10 +23,11 @@ import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import org.joml.Matrix4f;
+import net.minecraft.util.math.RotationAxis;
 
 @Environment(value=EnvType.CLIENT)
 public class ClockBlockEntityRender<T extends BlockEntity> implements BlockEntityRenderer<T> {
@@ -56,9 +58,9 @@ public class ClockBlockEntityRender<T extends BlockEntity> implements BlockEntit
         Resource resource = null;
         NativeImage nativeImage = null;
         try {
-            resource = resourceManager.getResource(frontIdentifier);
+            resource = resourceManager.getResource(frontIdentifier).get();
         }
-        catch(IOException exception) {
+        catch(NoSuchElementException exception) {
             return;
         }
         try {
@@ -81,7 +83,8 @@ public class ClockBlockEntityRender<T extends BlockEntity> implements BlockEntit
     }
 
     public float UdateClockTime(ClientWorld clientWorld) {
-        double skyAngle = clientWorld.getDimension().isNatural() ? (double)clientWorld.getSkyAngle(1.0f) : Math.random();
+        //double skyAngle = clientWorld.getDimension().isNatural() ? (double)clientWorld.getSkyAngle(1.0f) : Math.random();
+        double skyAngle = clientWorld.getDimension().hasSkyLight() ? (double)clientWorld.getSkyAngle(1.0f) : Math.random();
         if (clientWorld.getTime() != this.lastTick) {
             this.lastTick = clientWorld.getTime();
             double d = skyAngle - this.time;
@@ -101,9 +104,9 @@ public class ClockBlockEntityRender<T extends BlockEntity> implements BlockEntit
         Resource resource = null;
         NativeImage nativeImage = null;
         try {
-            resource = resourceManager.getResource(clockIdentifiers[clock_image]);
+            resource = resourceManager.getResource(clockIdentifiers[clock_image]).get();
         }
-        catch(IOException exception) {
+        catch(NoSuchElementException exception) {
             return;
         }
         try {
@@ -115,7 +118,7 @@ public class ClockBlockEntityRender<T extends BlockEntity> implements BlockEntit
         for (int i = 0; i < 16; ++i) {
             for (int j = 0; j < 16; ++j) {
                 int color = nativeImage.getColor(j, i);
-                if(NativeImage.getAlpha(color) != 0) {
+                if(ColorHelper.Abgr.getAlpha(color) != 0) {
                     this.texture.getImage().setColor(j, i, color);
                 }
             }
@@ -142,17 +145,17 @@ public class ClockBlockEntityRender<T extends BlockEntity> implements BlockEntit
         Direction facing = blockState.get(Properties.HORIZONTAL_FACING);
         int lightAbove = WorldRenderer.getLightmapCoordinates(blockEntity.getWorld(), blockEntity.getPos().north());
         if(facing == Direction.SOUTH) {
-            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
             matrices.translate(-128.0, 0.0, -128.0);
             lightAbove = WorldRenderer.getLightmapCoordinates(blockEntity.getWorld(), blockEntity.getPos().south());
         }
         if(facing == Direction.EAST) {
-            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(270.0f));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(270.0f));
             matrices.translate(0.0, 0.0, -128.0);
             lightAbove = WorldRenderer.getLightmapCoordinates(blockEntity.getWorld(), blockEntity.getPos().east());
         }
         if(facing == Direction.WEST) {
-            matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90.0f));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90.0f));
             matrices.translate(-128.0, 0.0, 0.0);
             lightAbove = WorldRenderer.getLightmapCoordinates(blockEntity.getWorld(), blockEntity.getPos().west());
         }

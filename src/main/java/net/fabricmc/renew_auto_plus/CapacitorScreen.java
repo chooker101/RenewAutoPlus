@@ -2,9 +2,9 @@ package net.fabricmc.renew_auto_plus;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -33,43 +33,42 @@ public class CapacitorScreen extends HandledScreen<CapacitorScreenHandler> {
     }
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.setShaderTexture(0, TEXTURE);
+        context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         int i = this.x;
         int j = this.y;
-        this.drawTexture(matrices, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        context.drawTexture(TEXTURE, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
         
-
         int u = mouseX - (i + 97);
         int v = mouseY - (j + 50);
         if(u >= 0 && v >= 0 && u < 18 && v < 12) {
-            this.drawTexture(matrices, i + 97, j + 50, 1, 178, 18, 12);
+            context.drawTexture(TEXTURE, i + 97, j + 50, 1, 178, 18, 12);
         }
         else {
-            this.drawTexture(matrices, i + 97, j + 50, 1, 166, 18, 12);
+            context.drawTexture(TEXTURE, i + 97, j + 50, 1, 166, 18, 12);
         }
         v = mouseY - (j + 20);
         if(u >= 0 && v >= 0 && u < 18 && v < 12) {
-            this.drawTexture(matrices, i + 97, j + 20, 20, 178, 18, 12);
+            context.drawTexture(TEXTURE, i + 97, j + 20, 20, 178, 18, 12);
         }
         else {
-            this.drawTexture(matrices, i + 97, j + 20, 20, 166, 18, 12);
+            context.drawTexture(TEXTURE, i + 97, j + 20, 20, 166, 18, 12);
         }
-        this.drawTexture(matrices, i + 62, j + 20, 39, 166, 18, 40);
+        context.drawTexture(TEXTURE, i + 62, j + 20, 39, 166, 18, 40);
         int k = ((CapacitorScreenHandler)this.handler).getChargeProgress();
-        this.drawTexture(matrices, i + 62, j + 20 + 40 - k, 57, 166 + 40 - k, 18, k + 1);
+        context.drawTexture(TEXTURE, i + 62, j + 20 + 40 - k, 57, 166 + 40 - k, 18, k + 1);
         
         String string = intToString(((CapacitorScreenHandler)this.handler).getCapacitance());
-        this.textRenderer.drawWithShadow(matrices, string, (float)(i + 100), (float)(j + 37), 8453920);
+        context.drawText(textRenderer, string, i + 100, j + 37, 8453920, true);
     }
  
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        renderBackground(matrices);
-        super.render(matrices, mouseX, mouseY, delta);
-        drawMouseoverTooltip(matrices, mouseX, mouseY);
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        renderBackground(context, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, delta);
+        drawMouseoverTooltip(context, mouseX, mouseY);
     }
  
     @Override

@@ -6,7 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.ProjectileDamageSource;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -27,12 +27,14 @@ public class AmethystBasicProjectileEntity extends AbstractMagicProjectileEntity
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
-        if (this.world.isClient) {
+        World world = this.getWorld();
+        if (world.isClient) {
             return;
         }
         Entity entity = entityHitResult.getEntity();
         Entity owner = this.getOwner();
-        entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 5.0f);
+        entity.damage(new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(RenewAutoPlusInitialize.DIRECT_MAGIC), this, owner), 5.0f);
+        //entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 5.0f);
         if(owner instanceof LivingEntity) {
             ((LivingEntity)owner).onAttacking(entity);
         }
@@ -43,7 +45,8 @@ public class AmethystBasicProjectileEntity extends AbstractMagicProjectileEntity
     @Override
     protected void onCollision(HitResult hitResult) {
         super.onCollision(hitResult);
-        if (!this.world.isClient) {
+        World world = this.getWorld();
+        if (!world.isClient) {
             if (hitResult.getType() == HitResult.Type.ENTITY && this.isOwner(((EntityHitResult)hitResult).getEntity())) {
                 return;
             }
@@ -57,14 +60,15 @@ public class AmethystBasicProjectileEntity extends AbstractMagicProjectileEntity
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        if (!this.world.isClient) {
+        World world = this.getWorld();
+        if (!world.isClient) {
             if(hasHitBlock) { //Some jank to make sure client hits atleast once
                 this.discard();
                 this.setOwner(null);
             }
         }
         super.onBlockHit(blockHitResult);
-        if(this.world.isClient){
+        if(world.isClient){
             world.addBlockBreakParticles(blockHitResult.getBlockPos(), world.getBlockState(blockHitResult.getBlockPos()));
         }
     }

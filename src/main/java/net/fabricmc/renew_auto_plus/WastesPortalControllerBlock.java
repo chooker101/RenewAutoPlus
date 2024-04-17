@@ -1,6 +1,7 @@
 package net.fabricmc.renew_auto_plus;
 
 import com.google.common.base.Predicates;
+import com.mojang.serialization.MapCodec;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -30,6 +31,7 @@ import net.minecraft.world.World;
 @SuppressWarnings("unchecked")
 
 public class WastesPortalControllerBlock extends BlockWithEntity {
+    public static final MapCodec<WastesPortalControllerBlock> CODEC = WastesPortalControllerBlock.createCodec(WastesPortalControllerBlock::new);
 	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     private static BlockPattern COMPLETED_FRAME;
 
@@ -37,6 +39,11 @@ public class WastesPortalControllerBlock extends BlockWithEntity {
 		super(settings);
 		setDefaultState(this.stateManager.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH));
 	}
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
@@ -69,7 +76,7 @@ public class WastesPortalControllerBlock extends BlockWithEntity {
 
     @Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerFacing().getOpposite());
+		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerLookDirection().getOpposite());
 	}
 
 	@Override

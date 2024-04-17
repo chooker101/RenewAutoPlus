@@ -4,12 +4,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.ProjectileDamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -26,7 +26,7 @@ public class OnyxBasicProjectileEntity extends AbstractMagicProjectileEntity {
 
     public OnyxBasicProjectileEntity(World world, LivingEntity owner, double velocityX, double velocityY, double velocityZ) {
         super(RenewAutoPlusInitialize.ONYX_BASIC_PROJECTILE_ENTITY, owner, velocityX, velocityY, velocityZ, world);
-        this.life = this.random.nextInt(0, 50);
+        this.life = this.random.nextBetween(0, 50);
     }
 
     @Override
@@ -38,13 +38,14 @@ public class OnyxBasicProjectileEntity extends AbstractMagicProjectileEntity {
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
-        if (this.world.isClient) {
+        World world = this.getWorld();
+        if (world.isClient) {
             return;
         }
         Entity entity = entityHitResult.getEntity();
         Entity owner = this.getOwner();
         entity.timeUntilRegen = 0;
-        entity.damage(new ProjectileDamageSource("directMagic", this, owner).setProjectile(), 4.0f);
+        entity.damage(new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(RenewAutoPlusInitialize.DIRECT_MAGIC), this, owner), 4.0f);
         if(owner instanceof LivingEntity) {
             ((LivingEntity)owner).onAttacking(entity);
         }
@@ -55,7 +56,8 @@ public class OnyxBasicProjectileEntity extends AbstractMagicProjectileEntity {
     @Override
     protected void onCollision(HitResult hitResult) {
         super.onCollision(hitResult);
-        if (!this.world.isClient) {
+        World world = this.getWorld();
+        if (!world.isClient) {
             if (hitResult.getType() == HitResult.Type.ENTITY && this.isOwner(((EntityHitResult)hitResult).getEntity())) {
                 return;
             }
@@ -69,14 +71,15 @@ public class OnyxBasicProjectileEntity extends AbstractMagicProjectileEntity {
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        if (!this.world.isClient) {
+        World world = this.getWorld();
+        if (!world.isClient) {
             if(hasHitBlock) {
                 this.discard();
                 this.setOwner(null);
             }
         }
         super.onBlockHit(blockHitResult);
-        if(this.world.isClient){
+        if(world.isClient){
             world.addBlockBreakParticles(blockHitResult.getBlockPos(), world.getBlockState(blockHitResult.getBlockPos()));
         }
     }

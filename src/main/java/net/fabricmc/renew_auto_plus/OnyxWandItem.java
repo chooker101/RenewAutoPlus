@@ -19,7 +19,6 @@ import net.minecraft.item.RangedWeaponItem;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.World;
 
 public class OnyxWandItem extends RangedWeaponItem implements AttackActionReplaced {
@@ -53,7 +52,7 @@ public class OnyxWandItem extends RangedWeaponItem implements AttackActionReplac
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-        boolean bl = user.getArrowType(itemStack).getCount() >= 3;
+        boolean bl = user.getProjectileType(itemStack).getCount() >= 3;
         user.getItemCooldownManager().set(this, 600);
         if (user.getAbilities().creativeMode || bl) {
             user.setCurrentHand(hand);
@@ -76,15 +75,14 @@ public class OnyxWandItem extends RangedWeaponItem implements AttackActionReplac
             return;
         }
         Vec3d vec3d = user.getRotationVec(1.0f);
-        Vec3f vec3f = new Vec3f(vec3d);
         final float h = 0.003f;
         OnyxWandItem wandItem = (OnyxWandItem)wand.getItem();
         OnyxBasicProjectileEntity projectileEntity = null;
         float x = (float)wandItem.random.nextGaussian() * h;
         float y = (float)wandItem.random.nextGaussian() * h;
-        projectileEntity = new OnyxBasicProjectileEntity(world, user, vec3f.getX() + x, vec3f.getY() + y, vec3f.getZ());
-        projectileEntity.setPosition(user.getX() + vec3f.getX(), (user.getEyeY() - 0.15) + vec3f.getY(), user.getZ() + vec3f.getZ());
-        projectileEntity.setVelocity(vec3f.getX() + x, vec3f.getY() + y, vec3f.getZ(), speed, divergence);
+        projectileEntity = new OnyxBasicProjectileEntity(world, user, vec3d.getX() + x, vec3d.getY() + y, vec3d.getZ());
+        projectileEntity.setPosition(user.getX() + vec3d.getX(), (user.getEyeY() - 0.15) + vec3d.getY(), user.getZ() + vec3d.getZ());
+        projectileEntity.setVelocity(vec3d.getX() + x, vec3d.getY() + y, vec3d.getZ(), speed, divergence);
         projectileEntity.setWasSecond(!wandItem.firstAttack);
         world.spawnEntity(projectileEntity);
         projectileEntity = null;
@@ -96,7 +94,7 @@ public class OnyxWandItem extends RangedWeaponItem implements AttackActionReplac
         
         wand.damage(1, user, e -> e.sendToolBreakStatus(hand));
         if (!user.getAbilities().creativeMode) {
-            user.getArrowType(wand).decrement(1);
+            user.getProjectileType(wand).decrement(1);
         }
         //world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1.0f, soundPitch);
     }
@@ -114,7 +112,7 @@ public class OnyxWandItem extends RangedWeaponItem implements AttackActionReplac
             world.spawnEntity(ghostEntity);
         }
         if (!user.getAbilities().creativeMode) {
-            user.getArrowType(wand).decrement(3);
+            user.getProjectileType(wand).decrement(3);
         }
         
         //world.playSound(null, user.getX(), user.getY(), user.getZ(), SoundEvents.ITEM_CROSSBOW_SHOOT, SoundCategory.PLAYERS, 1.0f, soundPitch);
@@ -123,7 +121,7 @@ public class OnyxWandItem extends RangedWeaponItem implements AttackActionReplac
     @Override
     public void onAttackServer(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-        boolean bl = !user.getArrowType(itemStack).isEmpty();
+        boolean bl = !user.getProjectileType(itemStack).isEmpty();
         if (user.getAbilities().creativeMode || bl) {
             user.setCurrentHand(hand);
             OnyxWandItem.shootBasicAttack(world, user, hand, itemStack, AquamarineWandItem.getSpeed(), AquamarineWandItem.getDivergence());

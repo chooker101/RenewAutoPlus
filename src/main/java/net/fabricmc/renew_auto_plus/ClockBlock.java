@@ -1,6 +1,6 @@
 package net.fabricmc.renew_auto_plus;
 
-import java.util.Random;
+import com.mojang.serialization.MapCodec;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -23,11 +23,13 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 @SuppressWarnings("unchecked")
 
 public class ClockBlock extends BlockWithEntity {
+    public static final MapCodec<ClockBlock> CODEC = ClockBlock.createCodec(ClockBlock::new);
 	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty POWERED = Properties.POWERED;
 
@@ -35,6 +37,11 @@ public class ClockBlock extends BlockWithEntity {
 		super(settings);
 		setDefaultState(this.stateManager.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH).with(Properties.POWERED, false));
 	}
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
@@ -68,7 +75,7 @@ public class ClockBlock extends BlockWithEntity {
 
     @Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerFacing().getOpposite());
+		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerLookDirection().getOpposite());
 	}
 
 	@Override
@@ -87,7 +94,7 @@ public class ClockBlock extends BlockWithEntity {
             world.setBlockState(pos, (BlockState)state.with(POWERED, false), Block.NOTIFY_LISTENERS);
         } else {
             world.setBlockState(pos, (BlockState)state.with(POWERED, true), Block.NOTIFY_LISTENERS);
-            world.createAndScheduleBlockTick(pos, this, 2);
+            world.scheduleBlockTick(pos, this, 2);
         }
         this.updateNeighbors(world, pos, state);
     }

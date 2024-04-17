@@ -1,5 +1,7 @@
 package net.fabricmc.renew_auto_plus;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -24,12 +26,18 @@ import net.minecraft.world.World;
 @SuppressWarnings("unchecked")
 
 public class AbacusBlock extends BlockWithEntity {
+    public static final MapCodec<AbacusBlock> CODEC = AbacusBlock.createCodec(AbacusBlock::new);
 	public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
 
     public AbacusBlock(Settings settings) {
 		super(settings);
 		setDefaultState(this.stateManager.getDefaultState().with(Properties.HORIZONTAL_FACING, Direction.NORTH));
 	}
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
@@ -44,7 +52,7 @@ public class AbacusBlock extends BlockWithEntity {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof AbacusBlockEntity) {
                 if(((AbacusBlockEntity)blockEntity).getOwnerListSize() == 0) {
-                    ((AbacusBlockEntity)blockEntity).tryAddOwner(player.getEntityName());
+                    ((AbacusBlockEntity)blockEntity).tryAddOwner(player.getNameForScoreboard());
                 }
                 player.openHandledScreen((AbacusBlockEntity)blockEntity);
             }
@@ -66,7 +74,7 @@ public class AbacusBlock extends BlockWithEntity {
 
     @Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {
-		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerFacing().getOpposite());
+		return (BlockState)this.getDefaultState().with(Properties.HORIZONTAL_FACING, ctx.getPlayerLookDirection().getOpposite());
 	}
 
 	@Override

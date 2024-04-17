@@ -1,7 +1,7 @@
 package net.fabricmc.renew_auto_plus;
 
-import net.minecraft.item.ToolMaterial;
 import net.minecraft.item.Items;
+import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
 
 public class BanishedToolMaterial implements ToolMaterial {

@@ -14,7 +14,7 @@ public class StringToCratePlayChannelHandler implements PlayChannelHandler {
     public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         StringToCrateC2SPacket packet = new StringToCrateC2SPacket(buf);
         try{
-            NetworkThreadUtils.forceMainThread(packet, handler, player.getWorld());
+            NetworkThreadUtils.forceMainThread(packet, handler, player.getServerWorld());
         }
         catch(Exception e) {
             return;
@@ -22,9 +22,9 @@ public class StringToCratePlayChannelHandler implements PlayChannelHandler {
     }
 
     public static void onStringToCrate(ServerPlayerEntity player, ServerPlayNetworkHandler handler, StringToCrateC2SPacket packet) {
-        if(player.world != null) {
+        if(player.getWorld() != null) {
             CrateBlockEntity crateBlockEntity = null;
-            BlockEntity blockEntity = player.world.getBlockEntity(packet.getBlockPos());
+            BlockEntity blockEntity = player.getWorld().getBlockEntity(packet.getBlockPos());
             if (blockEntity instanceof CrateBlockEntity) {
                 crateBlockEntity = (CrateBlockEntity)blockEntity;
             }

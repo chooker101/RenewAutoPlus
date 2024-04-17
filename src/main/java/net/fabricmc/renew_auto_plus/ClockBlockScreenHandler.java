@@ -39,6 +39,7 @@ public class ClockBlockScreenHandler extends ScreenHandler {
         this.addProperties(this.propertyDelegate);
     }
 
+    @SuppressWarnings("resource")
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
         if(id < 0 || id > 8) {
@@ -87,7 +88,7 @@ public class ClockBlockScreenHandler extends ScreenHandler {
                 break;
             }
         }
-        player.world.playSound(null, player.getBlockPos(), SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 1.0f, player.world.random.nextFloat() * 0.1f + 0.9f);
+        player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.BLOCKS, 1.0f, player.getWorld().random.nextFloat() * 0.1f + 0.9f);
         return true;
     }
  
@@ -97,7 +98,7 @@ public class ClockBlockScreenHandler extends ScreenHandler {
     }
  
     @Override
-    public ItemStack transferSlot(PlayerEntity player, int invSlot) {
+    public ItemStack quickMove(PlayerEntity player, int invSlot) {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = (Slot)this.slots.get(invSlot);
         if (slot != null && slot.hasStack()) {

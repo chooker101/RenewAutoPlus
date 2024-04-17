@@ -20,7 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.RotationAxis;
 
 @Pseudo
 @Mixin(HeldItemRenderer.class)
@@ -48,7 +48,7 @@ public abstract class HeldItemRendererExtension {
                 matrices.push();
                 matrices.translate((bl ? -1.0 : 1.0) / 2.0, -0.1, -0.6);
                 applySwingOffset(matrices, arm, swingProgress);
-                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
                 matrices.translate(0.0, -0.9, 0.0);
                 RubyChargeRenderHelper.renderChargeAnim((RubyWandItem)item.getItem(), matrices, vertexConsumers, light);
                 matrices.pop();
@@ -62,8 +62,8 @@ public abstract class HeldItemRendererExtension {
                 int segments = wandSegments > 20 ? 20 : wandSegments;
                 matrices.push();
                 matrices.translate(0.8, -0.4, -0.8);
-                matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(MathHelper.lerp((float)segments / 20.0f, 4.0f, 2.0f)));
-                matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(MathHelper.lerp((float)segments / 20.0f, 8.0f, 4.0f)));
+                matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(MathHelper.lerp((float)segments / 20.0f, 4.0f, 2.0f)));
+                matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(MathHelper.lerp((float)segments / 20.0f, 8.0f, 4.0f)));
                 for(int heightOffset = 0; heightOffset < segments; heightOffset++) {
                     matrices.push();
                     matrices.scale(0.7f, 0.7f, 0.7f); //Scale here to not effect hit effect, maybe add another push around? More scared of stack limit/matrix copy

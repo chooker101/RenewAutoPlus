@@ -1,10 +1,9 @@
 package net.fabricmc.renew_auto_plus.extension;
 
-import net.fabricmc.renew_auto_plus.BlockTagsExtension;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ToolMaterial;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.registry.tag.BlockTags;
 
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.PickaxeItem;

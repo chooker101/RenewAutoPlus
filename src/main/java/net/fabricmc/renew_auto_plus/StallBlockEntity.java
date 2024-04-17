@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
+
 import java.util.Map.Entry;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,10 +18,11 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
 import net.minecraft.village.VillagerProfession;
 
 public class StallBlockEntity extends BlockEntity implements AutoCloseable {
@@ -45,7 +48,7 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
             for(NbtElement nbtCompound : itemList) {
                 if(nbtCompound instanceof NbtCompound) {
                     Identifier id = new Identifier(((NbtCompound)nbtCompound).getString("id"));
-                    Item item = Registry.ITEM.get(id);
+                    Item item = Registries.ITEM.get(id);
                     int count = ((NbtCompound)nbtCompound).getInt("Count");
                     if(item != null && count >= 0) {
                         inventory.put(item, count);
@@ -68,7 +71,7 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
             for (Entry<Item, Integer> item : inventory.entrySet()) {
                 if (item.getValue() < 0) continue;
                 NbtCompound nbtCompound = new NbtCompound();
-                Identifier identifier = Registry.ITEM.getId(item.getKey());
+                Identifier identifier = Registries.ITEM.getId(item.getKey());
                 nbtCompound.putString("id", identifier == null ? "minecraft:air" : identifier.toString());
                 nbtCompound.putInt("Count", item.getValue());
                 nbtList.add(nbtCompound);
@@ -131,11 +134,11 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
         }
         int alreadyUsedAmount = 0;
         HashMap<Item, Integer> itemsUsed = new HashMap<>();
-        List<Recipe<?>> recipes = findCraftingRecipesFromId(removeItem);
-        for(Recipe<?> recipe : recipes) {
+        List<RecipeEntry<?>> recipes = findCraftingRecipesFromId(removeItem);
+        for(RecipeEntry<?> recipe : recipes) {
             if (recipe != null) {
                 itemsUsed = new HashMap<>();
-                for(Ingredient ingredient : recipe.getIngredients()){
+                for(Ingredient ingredient : recipe.value().getIngredients()){
                     if(ingredient.isEmpty()) continue;
                     boolean hasAnIngredient = false;
                     for(ItemStack item : ingredient.getMatchingStacks()) {
@@ -196,7 +199,7 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
 
     private boolean containsTradeItemAlready(StallTrade tradeOffer) {
         for(StallTrade existingTrade : stallTradeList) {
-            if(tradeOffer.getTradedItem().isItemEqual(existingTrade.getTradedItem())) {
+            if(ItemStack.areItemsEqual(tradeOffer.getTradedItem(), existingTrade.getTradedItem())) {
                 return true;
             }
         }
@@ -228,8 +231,8 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
         }
     }
 
-    public List<Recipe<?>> findCraftingRecipesFromId(Item outputItem) {
-        return world.getRecipeManager().values().stream().filter(r -> r.getOutput().getItem().equals(outputItem)).toList();
+    public List<RecipeEntry<?>> findCraftingRecipesFromId(Item outputItem) {
+        return world.getRecipeManager().values().stream().filter(r -> r.value().getResult(MinecraftClient.getInstance().world.getRegistryManager()).getItem().equals(outputItem)).toList();
     }
 
     public int getItemsForTrade(StallTrade tradeOffer) {
@@ -245,11 +248,11 @@ public class StallBlockEntity extends BlockEntity implements AutoCloseable {
         if(inventory.get(tradeItem) != null) {
             amountNotNeededToBeCrafted = inventory.get(tradeItem);
         }
-        List<Recipe<?>> recipes = findCraftingRecipesFromId(tradeItem);
+        List<RecipeEntry<?>> recipes = findCraftingRecipesFromId(tradeItem);
         int howManyCanCraft = 0;
-        for (Recipe<?> recipe : recipes) {
+        for (RecipeEntry<?> recipe : recipes) {
             if (recipe != null) {
-                howManyCanCraft += getHowManyCanCraft(recipe, amount);
+                howManyCanCraft += getHowManyCanCraft(recipe.value(), amount);
             }
         }
         return howManyCanCraft + amountNotNeededToBeCrafted;
