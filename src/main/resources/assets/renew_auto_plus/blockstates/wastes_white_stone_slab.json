@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "renew_auto_plus:block/wastes_white_stone_slab"
+    },
+    "type=double": {
+      "model": "renew_auto_plus:block/wastes_white_stone_bricks"
+    },
+    "type=top": {
+      "model": "renew_auto_plus:block/wastes_white_stone_slab_top"
+    }
+  }
+}

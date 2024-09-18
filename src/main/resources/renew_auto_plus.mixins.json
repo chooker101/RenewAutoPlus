@@ -15,7 +15,8 @@
     "HeldItemRendererExtension",
     "HeldItemFeatureRendererExtension",
     "PlayerEntityRendererExtension",
-    "EntityExtension"
+    "EntityExtension",
+    "WrittenBookItemExtension"
   ],
   "client": [],
   "server": [],

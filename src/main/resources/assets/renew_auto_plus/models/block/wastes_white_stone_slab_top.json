@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "renew_auto_plus:block/wastes_white_stone_bricks",
+    "side": "renew_auto_plus:block/wastes_white_stone_bricks",
+    "top": "renew_auto_plus:block/wastes_white_stone_bricks"
+  }
+}

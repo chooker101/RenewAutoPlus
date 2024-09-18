@@ -1,0 +1,65 @@
+{
+    "type": "minecraft:chest",
+    "pools": [
+      {
+        "rolls": 2,
+        "bonus_rolls": 0,
+        "entries": [
+          {
+            "type": "minecraft:item",
+            "name": "renew_auto_plus:raw_diamond",
+            "weight": 40
+          },
+          {
+            "type": "minecraft:item",
+            "name": "renew_auto_plus:aquamarine_shard"
+          },
+          {
+            "type": "minecraft:item",
+            "name": "renew_auto_plus:onyx_shard"
+          },
+          {
+            "type": "minecraft:item",
+            "name": "renew_auto_plus:ruby_shard"
+          },
+          {
+            "type": "minecraft:item",
+            "name": "renew_auto_plus:topaz_shard"
+          }
+        ]
+      },
+      {
+        "rolls": 1,
+        "entries": [
+          {
+            "type": "minecraft:item",
+            "name": "renew_auto_plus:wastes_portal_frame",
+            "functions": [
+              {
+                "function": "minecraft:set_count",
+                "count": {
+                  "min": 8,
+                  "max": 12
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "rolls": 1,
+        "entries": [
+          {
+            "type": "minecraft:item",
+            "name": "renew_auto_plus:wastes_portal_controller",
+            "conditions": [
+              {
+                "condition": "minecraft:random_chance",
+                "chance": 0.75
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }

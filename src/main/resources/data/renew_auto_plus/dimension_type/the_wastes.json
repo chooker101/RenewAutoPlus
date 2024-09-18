@@ -13,7 +13,10 @@
     "effects": "renew_auto_plus:the_wastes",
     "infiniburn": "#minecraft:infiniburn_overworld",
     "min_y": -64,
-    "height": 288,
-    "monster_spawn_light_level": 5,
-    "monster_spawn_block_light_limit": 5
+    "height": 352,
+    "monster_spawn_light_level": {
+      "type": "minecraft:constant",
+      "value": 15
+    },
+    "monster_spawn_block_light_limit": 15
   }

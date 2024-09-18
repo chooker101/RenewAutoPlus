@@ -1,0 +1,8 @@
+{
+    "parent": "minecraft:block/slab",
+    "textures": {
+      "bottom": "renew_auto_plus:block/white_sandstone_bottom",
+      "side": "renew_auto_plus:block/white_sandstone",
+      "top": "renew_auto_plus:block/white_sandstone_top"
+    }
+  }

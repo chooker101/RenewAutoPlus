@@ -1,0 +1,15 @@
+{
+    "structures": [
+      {
+        "structure": "renew_auto_plus:void_temple",
+        "weight": 1
+      }
+    ],
+    "placement": {
+      "type": "minecraft:random_spread",
+      "salt": 14357617,
+      "spacing": 30,
+      "separation": 10
+    }
+  }
+  
