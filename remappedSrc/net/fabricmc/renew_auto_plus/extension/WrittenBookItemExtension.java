@@ -1,9 +1,9 @@
-package net.fabricmc.renew_auto_plus.extension;
+package net.renew_auto_plus.extension;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 
-import net.fabricmc.renew_auto_plus.VoidVillagerEntity;
+import net.renew_auto_plus.VoidVillagerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;

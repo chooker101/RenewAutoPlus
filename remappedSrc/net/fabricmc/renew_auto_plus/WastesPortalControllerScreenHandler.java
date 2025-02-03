@@ -1,8 +1,8 @@
-package net.fabricmc.renew_auto_plus;
+package net.renew_auto_plus;
 
 import com.mojang.datafixers.util.Pair;
 
-import net.fabricmc.renew_auto_plus.helper.OverworldInventoryStorage;
+import net.renew_auto_plus.helper.OverworldInventoryStorage;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.mob.MobEntity;

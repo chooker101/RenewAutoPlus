@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto_plus.helper;
+package net.renew_auto_plus.helper;
 
 import java.util.UUID;
 import java.util.function.Predicate;

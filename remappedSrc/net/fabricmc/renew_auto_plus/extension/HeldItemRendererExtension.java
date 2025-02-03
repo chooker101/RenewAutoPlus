@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto_plus.extension;
+package net.renew_auto_plus.extension;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -8,10 +8,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.fabricmc.renew_auto_plus.RubyWandItem;
-import net.fabricmc.renew_auto_plus.TopazBeamFeatureRenderer;
-import net.fabricmc.renew_auto_plus.TopazWandItem;
-import net.fabricmc.renew_auto_plus.helper.RubyChargeRenderHelper;
+import net.renew_auto_plus.RubyWandItem;
+import net.renew_auto_plus.TopazBeamFeatureRenderer;
+import net.renew_auto_plus.TopazWandItem;
+import net.renew_auto_plus.helper.RubyChargeRenderHelper;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.HeldItemRenderer;

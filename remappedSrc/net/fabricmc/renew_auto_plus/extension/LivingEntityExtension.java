@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto_plus.extension;
+package net.renew_auto_plus.extension;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.fabricmc.renew_auto_plus.BanishedParryingSwordItem;
-import net.fabricmc.renew_auto_plus.RenewAutoPlusInitialize;
-import net.fabricmc.renew_auto_plus.RubyWandItem;
+import net.renew_auto_plus.BanishedParryingSwordItem;
+import net.renew_auto_plus.RenewAutoPlusInitialize;
+import net.renew_auto_plus.RubyWandItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;

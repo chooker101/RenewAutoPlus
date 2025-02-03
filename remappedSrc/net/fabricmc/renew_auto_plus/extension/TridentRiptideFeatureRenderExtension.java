@@ -1,12 +1,12 @@
-package net.fabricmc.renew_auto_plus.extension;
+package net.renew_auto_plus.extension;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import net.fabricmc.renew_auto_plus.RenewAutoPlusInitialize;
-import net.fabricmc.renew_auto_plus.RubyWandItem;
+import net.renew_auto_plus.RenewAutoPlusInitialize;
+import net.renew_auto_plus.RubyWandItem;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.TridentRiptideFeatureRenderer;

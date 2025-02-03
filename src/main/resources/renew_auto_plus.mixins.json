@@ -1,20 +1,13 @@
 {
   "required": true,
   "minVersion": "0.8.2",
-  "package": "net.fabricmc.renew_auto_plus.extension",
+  "package": "net.renew_auto_plus.extension",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
     "PickaxeItemExtension",
     "FurnaceBlockExtension",
     "LivingEntityExtension",
-    "MinecraftClientExtension",
-    "LivingEntityRendererExtension",
-    "InGameHudExtension",
     "PlayerEntityExtension",
-    "TridentRiptideFeatureRenderExtension",
-    "HeldItemRendererExtension",
-    "HeldItemFeatureRendererExtension",
-    "PlayerEntityRendererExtension",
     "EntityExtension",
     "WrittenBookItemExtension"
   ],

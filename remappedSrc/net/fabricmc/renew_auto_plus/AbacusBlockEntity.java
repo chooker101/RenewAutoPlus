@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto_plus;
+package net.renew_auto_plus;
 
 import java.util.HashMap;
 import java.util.Vector;

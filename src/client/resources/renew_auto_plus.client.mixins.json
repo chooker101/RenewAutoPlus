@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "minVersion": "0.8.2",
+  "package": "net.renew_auto_plus.client.extension",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [],
+  "client": [
+    "MinecraftClientExtension",
+    "LivingEntityRendererExtension",
+    "InGameHudExtension",
+    "TridentRiptideFeatureRenderExtension",
+    "HeldItemRendererExtension",
+    "HeldItemFeatureRendererExtension",
+    "PlayerEntityRendererExtension"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

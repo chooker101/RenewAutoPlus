@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto_plus;
+package net.renew_auto_plus;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

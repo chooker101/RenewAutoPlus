@@ -1,6 +1,6 @@
-package net.fabricmc.renew_auto_plus;
+package net.renew_auto_plus;
 
-import net.fabricmc.renew_auto_plus.helper.PublicProjectileEntity;
+import net.renew_auto_plus.helper.PublicProjectileEntity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

@@ -1,8 +1,8 @@
-package net.fabricmc.renew_auto_plus;
+package net.renew_auto_plus;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.PlayChannelHandler;
-import net.fabricmc.renew_auto_plus.helper.AttackActionReplaced;
+import net.renew_auto_plus.helper.AttackActionReplaced;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetworkThreadUtils;
 import net.minecraft.network.PacketByteBuf;

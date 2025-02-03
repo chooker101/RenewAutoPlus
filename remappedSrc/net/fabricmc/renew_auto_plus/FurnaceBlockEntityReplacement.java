@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto_plus;
+package net.renew_auto_plus;
 
 import net.minecraft.block.AbstractFurnaceBlock;
 import net.minecraft.block.Block;

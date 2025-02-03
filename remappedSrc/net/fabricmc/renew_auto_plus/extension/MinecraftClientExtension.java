@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto_plus.extension;
+package net.renew_auto_plus.extension;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -10,11 +10,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.renew_auto_plus.RenewAutoPlusInitialize;
-import net.fabricmc.renew_auto_plus.ReplacedOnAttackC2SPacket;
-import net.fabricmc.renew_auto_plus.ReplacedStopAttackC2SPacket;
-import net.fabricmc.renew_auto_plus.helper.AttackActionReplaced;
-import net.fabricmc.renew_auto_plus.helper.AttackActionReplacedWithCharge;
+import net.renew_auto_plus.RenewAutoPlusInitialize;
+import net.renew_auto_plus.ReplacedOnAttackC2SPacket;
+import net.renew_auto_plus.ReplacedStopAttackC2SPacket;
+import net.renew_auto_plus.helper.AttackActionReplaced;
+import net.renew_auto_plus.helper.AttackActionReplacedWithCharge;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.WindowEventHandler;
 import net.minecraft.client.network.ClientPlayNetworkHandler;

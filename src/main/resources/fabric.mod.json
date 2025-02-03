@@ -19,14 +19,18 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.renew_auto_plus.RenewAutoPlusInitialize"
+      "net.renew_auto_plus.RenewAutoPlusInitialize"
     ],
     "client": [
-      "net.fabricmc.renew_auto_plus.RenewAutoPlusClientInitialize"
+      "net.renew_auto_plus.RenewAutoPlusClientInitialize"
     ]
   },
   "mixins": [
-    "renew_auto_plus.mixins.json"
+    "renew_auto_plus.mixins.json",
+    {
+			"config": "renew_auto_plus.client.mixins.json",
+			"environment": "client"
+		}
   ],
 
   "depends": {

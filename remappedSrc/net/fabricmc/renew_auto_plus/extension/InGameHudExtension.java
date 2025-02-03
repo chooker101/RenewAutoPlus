@@ -1,4 +1,4 @@
-package net.fabricmc.renew_auto_plus.extension;
+package net.renew_auto_plus.extension;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.util.Identifier;
-import net.fabricmc.renew_auto_plus.RenewAutoPlusInitialize;
+import net.renew_auto_plus.RenewAutoPlusInitialize;
 import net.minecraft.client.MinecraftClient;
 
 @Pseudo

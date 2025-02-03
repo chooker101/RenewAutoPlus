@@ -1,7 +1,7 @@
-package net.fabricmc.renew_auto_plus;
+package net.renew_auto_plus;
 
-import java.util.Optional;
 import java.util.UUID;
+import java.util.Vector;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +26,6 @@ import net.minecraft.item.WrittenBookItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.world.ServerWorld;
@@ -41,16 +40,20 @@ import net.minecraft.village.VillagerType;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.structure.Structure;
 
 public class VoidVillagerEntity extends PassiveEntity implements VillagerDataContainer {
     private static final TrackedData<VillagerData> VILLAGER_DATA = DataTracker.registerData(VoidVillagerEntity.class, TrackedDataHandlerRegistry.VILLAGER_DATA);
     private EaterFightManager fightManager;
+    private State currentState = State.NORMAL;
+    private int stateTimer = 0;
 
     @Nullable
     private UUID targetUuid;
 
     public VoidVillagerEntity(EntityType<? extends PassiveEntity> entityType, World world) {
         super(entityType, world);
+        this.setPersistent();
     }
 
     public static DefaultAttributeContainer.Builder createMobAttributes() {
@@ -110,10 +113,33 @@ public class VoidVillagerEntity extends PassiveEntity implements VillagerDataCon
             }
             String title = nbt.getString(WrittenBookItem.TITLE_KEY);
             if(title.equals("You're a Nerd")) {
-                //Teleport player
-                ServerWorld world = (ServerWorld)this.method_48926();
-                BlockPos nearestTemple = world.locateStructure(TagKey.of(RegistryKeys.STRUCTURE, new Identifier("void_temple")), this.getBlockPos(), 50, false);
-                fightManager = new EaterFightManager(nearestTemple, EaterFightManager.FightType.BEGINNER);
+                if(!this.method_48926().isClient) {
+                    ServerWorld world = (ServerWorld)this.method_48926();
+                    TagKey<Structure> tag = TagKey.of(RegistryKeys.STRUCTURE, new Identifier("renew_auto_plus", "void_temple"));
+                    BlockPos nearestTemple = world.locateStructure(tag, this.getBlockPos(), 50, false);
+                    //nearestTemple = world.getStructureAccessor().getStructureContaining(this.getBlockPos(), tag).getPos().;
+                    fightManager = new EaterFightManager(world, nearestTemple, this.getBlockPos(), EaterFightManager.FightDifficulty.BEGINNER);
+                    fightManager.addPlayer(player);
+                    if(!fightManager.isVillagerPosValid()) {
+                        return super.interactMob(player, hand);
+                    }
+                    BlockPos spawnLocation = fightManager.getPlayerSpawnLocation();
+                    if(world.getBlockState(spawnLocation).isAir()) {
+                        player.teleport(((double)spawnLocation.getX()) + 0.5, spawnLocation.getY(), ((double)spawnLocation.getZ()) + 0.5);
+                    }
+                    else {
+                        return super.interactMob(player, hand);
+                    }
+                    spawnLocation = fightManager.getVillagerSpawnLocation();
+                    if(world.getBlockState(spawnLocation).isAir()) {
+                        this.teleport(((double)spawnLocation.getX()) + 0.5, spawnLocation.getY(), ((double)spawnLocation.getZ()) + 0.5);
+                    }
+                    else {
+                        return super.interactMob(player, hand);
+                    }
+                    currentState = State.BATTLE;
+                    stateTimer = 40;
+                }
                 return ActionResult.success(this.method_48926().isClient);
             }
         }
@@ -122,6 +148,29 @@ public class VoidVillagerEntity extends PassiveEntity implements VillagerDataCon
 
     @Override
     public void tick() {
+        if(stateTimer > 0) {
+            stateTimer--;
+        }
+        else {
+            if(currentState == State.BATTLE) {
+                currentState = State.NORMAL;
+                BlockPos spawnLocation = fightManager.getVillagerLobbySpawnLocation();
+                if(this.method_48926().getBlockState(spawnLocation).isAir()) {
+                    this.teleport(((double)spawnLocation.getX()) + 0.5, spawnLocation.getY(), ((double)spawnLocation.getZ()) + 0.5);
+                }
+                spawnLocation = fightManager.getPlayerLobbySpawnLocation();
+                if(this.method_48926().getBlockState(spawnLocation).isAir()) {
+                    Vector<PlayerEntity> players = fightManager.getPlayerList();
+                    for (PlayerEntity player : players) {
+                        player.teleport(((double)spawnLocation.getX()) + 0.5, spawnLocation.getY(), ((double)spawnLocation.getZ()) + 0.5);
+                    }
+                }
+            }
+            else if(currentState == State.CHARGING) {
+                currentState = State.BATTLE;
+                //Move fight start code here
+            }
+        }
         super.tick();
     }
 
@@ -139,5 +188,11 @@ public class VoidVillagerEntity extends PassiveEntity implements VillagerDataCon
     @Override
     public void setVillagerData(VillagerData villagerData) {
         this.dataTracker.set(VILLAGER_DATA, villagerData);
+    }
+
+    public static enum State {
+        NORMAL,
+        CHARGING,
+        BATTLE
     }
 }
